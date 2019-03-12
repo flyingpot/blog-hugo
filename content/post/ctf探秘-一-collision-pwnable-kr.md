@@ -4,8 +4,6 @@ title = "CTF探秘（一）—— collision (pwnable.kr)"
 url = "/post/ctf1"
 
 +++
-CTF探秘（一）—— collision (pwnable.kr)
-
 \# 一、前言
 
 最近突然对CTF产生了兴趣，感觉能从中学到很多东西。所以我打算写一系列文章记录在刷题过程中学到的知识。
@@ -18,6 +16,64 @@ CTF探秘（一）—— collision (pwnable.kr)
 
 col.c的代码如下：
 
+    #include <stdio.h>
+    
+    #include <string.h>
+    
+    unsigned long hashcode = 0x21DD09EC;
+    
+    unsigned long check_password(const char* p){
+    
+            int* ip = (int*)p;
+    
+            int i;
+    
+            int res=0;
+    
+            for(i=0; i<5; i++){
+    
+                    res += ip[i];
+    
+            }
+    
+            return res;
+    
+    }
+    
+    int main(int argc, char* argv[]){
+    
+            if(argc<2){
+    
+                    printf("usage : %s [passcode]\n", argv[0]);
+    
+                    return 0;
+    
+            }
+    
+            if(strlen(argv[1]) != 20){
+    
+                    printf("passcode length should be 20 bytes\n");
+    
+                    return 0;
+    
+            }
+    
+            if(hashcode == check_password( argv[1] )){
+    
+                    system("/bin/cat flag");
+    
+                    return 0;
+    
+            }
+    
+            else
+    
+                    printf("wrong passcode.\n");
+    
+            return 0;
+    
+    }
+
 \#include <stdio.h>
 
 \#include <string.h>
@@ -27,17 +83,17 @@ unsigned long hashcode = 0x21DD09EC;
 unsigned long check_password(const char* p){
 
         int* ip = (int*)p;
-
+    
         int i;
-
+    
         int res=0;
-
+    
         for(i=0; i<5; i++){
-
+    
                 res += ip\[i\];
-
+    
         }
-
+    
         return res;
 
 }
@@ -45,33 +101,33 @@ unsigned long check_password(const char* p){
 int main(int argc, char* argv\[\]){
 
         if(argc<2){
-
+    
                 printf("usage : %s \[passcode\]\\n", argv\[0\]);
-
+    
                 return 0;
-
+    
         }
-
+    
         if(strlen(argv\[1\]) != 20){
-
+    
                 printf("passcode length should be 20 bytes\\n");
-
+    
                 return 0;
-
+    
         }
-
+    
         if(hashcode == check_password( argv\[1\] )){
-
+    
                 system("/bin/cat flag");
-
+    
                 return 0;
-
+    
         }
-
+    
         else
-
+    
                 printf("wrong passcode.\\n");
-
+    
         return 0;
 
 }
@@ -96,6 +152,5 @@ info ls "What information is listed"
 
 \#### 参考链接
 
-  1. \[ File Permissions and Attributes \]
-
-  2. \[Setuid\]
+1. \[ File Permissions and Attributes \]
+2. \[Setuid\]
