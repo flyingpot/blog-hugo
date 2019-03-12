@@ -16,4 +16,5 @@ fields:
   name: post
   default: post
 pages:
+- content/post/ctf探秘-一-collision-pwnable-kr-1.md
 - content/post/ctf探秘-一-collision-pwnable-kr.md
