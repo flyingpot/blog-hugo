@@ -12,9 +12,8 @@ fields:
   name: date
   label: Date
 - type: text
-  label: Type
-  name: post
-  default: post
+  name: url
+  label: Url
 pages:
 - content/post/ctf探秘-一-collision-pwnable-kr-1.md
 - content/post/ctf探秘-一-collision-pwnable-kr.md
