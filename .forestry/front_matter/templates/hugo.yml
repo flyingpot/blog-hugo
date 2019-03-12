@@ -15,9 +15,5 @@ fields:
   label: Type
   name: post
   default: post
-- type: text
-  label: Url
-  name: url
-  default: "/post/--"
 pages:
 - content/post/ctf探秘-一-collision-pwnable-kr.md
