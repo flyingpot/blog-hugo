@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.53" />
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Fanjingbo" />
+  <meta property="og:url" content="https://fanjingbo.com/post/gnupg/" />
+  <link rel="canonical" href="https://fanjingbo.com/post/gnupg/" />
+  <link rel="shortcut icon" href="https://fanjingbo.com/logo.png" type="image/x-png" />
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https://fanjingbo.com"
+      },
+      "articleSection" : "post",
+      "name" : "GPG牛刀小试",
+      "headline" : "GPG牛刀小试",
+      "description" : "一、GPG简介 GPG（或GnuPG）是自由软件基金会（Free Software Foundation）开发的程 序，是基于商业加密软件PGP（Pretty Good Privacy）的作者（Phil Zimmermann）倡导提出的开放标准OpenPGP实现的，主要作用是加密，签名和生成非对称密钥对。
+二、非对称加密与数字签名 要知道什么是非对称加密，就要先知道什么是对称加密。对称加密就是加密和解密使用相同的密钥，或者两个可以简单地相互推算的密钥。比如，经典的凯撒密码，就是将字母表进行移位映射加密，A加密为B，B加密为C，这样，反向移位就可以解密。然而，对称加密如果密钥泄露，安全就不复存在了。非对称加密就可以解决这个问题。
+简单来说，非对称加密就是使用公钥加密传输，使用私钥解密。比如说Alice要向Bob传递信息，Bob要先生成非对称密钥对，自己保留私钥，给Alice公钥。Alice使用Bob的公钥加密信息，Bob拿到加密信息后，使用自己的私钥解密查看信息。这就避免了因为密钥丢失导致的安全问题。
+而数字签名，也是利用非对称加密技术的应用。首先，用Bob的私钥对文件加密（实际是文件的hash结果），加密的结果作为数字签名发送给Alice。Alice拿到数字签名和文件，使用Bob的公钥解密数字签名，将得到的结果与文件的hash结果作对比，如果一致，证明文件确实是Bob签署的。
+三、GPG上手 本来我写了一些常用命令，后来发现没啥意思，命令随便一查就能查到。我就写一些比较有趣的东西吧。
+1.Keyring 在密码学中，keyring存储的是key，十分形象，key的ring。在GPG中，如下命令：
+gpg --list-keys  可以列出在keyring中的所有key。其实keyring可以看成一个通讯录，里面存储的key可以看做是一个个收件人的信息，消息的发送过程就可以类比成加密。
+2.Fingerprint 由于公钥很长，所以使用fingerprint来指代对应的公钥，相当于公钥的ID。不过很多时候，使用公钥生成时输入的姓名和邮箱也可以找到对应的公钥，只不过不是一一对应的关系。
+3.公钥签名（Key Signing）和Key Signing Party 在非对称加密中，公钥的有效性十分重要。还是拿Alice和Bob举例子，如果Eve将自己的公钥伪装成Bob的公钥发送给Alice，那么Alice就会用Eve的公钥加密数据，Eve就可以使用自己的私钥解密得到数据。
+因此，如果利用数字签名技术，第三个人Dave可以使用他的私钥对Bob的公钥进行签名，表明他认可这个公钥的真实性，这样Alice就可以使用Dave的公钥验证出Dave对这个公钥进行了数字签名。这样Dave就类似于一个担保人，证明该公钥属于Bob。
+既然Dave可以签名，那么其他人也可以签名。可以认为签名的人越多，公钥越可信。密码学中，有一个概念是信任网络（Web of Trust）。它的提出者也是PGP的提出者Phil Zimmermann是这样说的：
+ As time goes on, you will accumulate keys from other people that you may want to designate as trusted introducers. Everyone else will each choose their own trusted introducers. And everyone will gradually accumulate and distribute with their key a collection of certifying signatures from other people, with the expectation that anyone receiving it will trust at least one or two of the signatures.",
+      "inLanguage" : "en-US",
+      "author" : "Fanjingbo",
+      "creator" : "Fanjingbo",
+      "publisher": "Fanjingbo",
+      "accountablePerson" : "Fanjingbo",
+      "copyrightHolder" : "Fanjingbo",
+      "copyrightYear" : "2019",
+      "datePublished": "2019-01-21 11:09:10 &#43;0800 CST",
+      "dateModified" : "2019-01-21 11:09:10 &#43;0800 CST",
+      "url" : "https://fanjingbo.com/post/gnupg/",
+      "keywords" : [  ]
+  }
+</script>
+<title>GPG牛刀小试 - Fan Jingbo&#39;s Blog</title>
+  <meta property="og:title" content="GPG牛刀小试 - Fan Jingbo&#39;s Blog" />
+  <meta property="og:type" content="article" />
+  <meta name="description" content="一、GPG简介 GPG（或GnuPG）是自由软件基金会（Free Software Foundation）开发的程 序，是基于商业加密软件PGP（Pretty Good Privacy）的作者（Phil Zimmermann）倡导提出的开放标准OpenPGP实现的，主要作用是加密，签名和生成非对称密钥对。
+二、非对称加密与数字签名 要知道什么是非对称加密，就要先知道什么是对称加密。对称加密就是加密和解密使用相同的密钥，或者两个可以简单地相互推算的密钥。比如，经典的凯撒密码，就是将字母表进行移位映射加密，A加密为B，B加密为C，这样，反向移位就可以解密。然而，对称加密如果密钥泄露，安全就不复存在了。非对称加密就可以解决这个问题。
+简单来说，非对称加密就是使用公钥加密传输，使用私钥解密。比如说Alice要向Bob传递信息，Bob要先生成非对称密钥对，自己保留私钥，给Alice公钥。Alice使用Bob的公钥加密信息，Bob拿到加密信息后，使用自己的私钥解密查看信息。这就避免了因为密钥丢失导致的安全问题。
+而数字签名，也是利用非对称加密技术的应用。首先，用Bob的私钥对文件加密（实际是文件的hash结果），加密的结果作为数字签名发送给Alice。Alice拿到数字签名和文件，使用Bob的公钥解密数字签名，将得到的结果与文件的hash结果作对比，如果一致，证明文件确实是Bob签署的。
+三、GPG上手 本来我写了一些常用命令，后来发现没啥意思，命令随便一查就能查到。我就写一些比较有趣的东西吧。
+1.Keyring 在密码学中，keyring存储的是key，十分形象，key的ring。在GPG中，如下命令：
+gpg --list-keys  可以列出在keyring中的所有key。其实keyring可以看成一个通讯录，里面存储的key可以看做是一个个收件人的信息，消息的发送过程就可以类比成加密。
+2.Fingerprint 由于公钥很长，所以使用fingerprint来指代对应的公钥，相当于公钥的ID。不过很多时候，使用公钥生成时输入的姓名和邮箱也可以找到对应的公钥，只不过不是一一对应的关系。
+3.公钥签名（Key Signing）和Key Signing Party 在非对称加密中，公钥的有效性十分重要。还是拿Alice和Bob举例子，如果Eve将自己的公钥伪装成Bob的公钥发送给Alice，那么Alice就会用Eve的公钥加密数据，Eve就可以使用自己的私钥解密得到数据。
+因此，如果利用数字签名技术，第三个人Dave可以使用他的私钥对Bob的公钥进行签名，表明他认可这个公钥的真实性，这样Alice就可以使用Dave的公钥验证出Dave对这个公钥进行了数字签名。这样Dave就类似于一个担保人，证明该公钥属于Bob。
+既然Dave可以签名，那么其他人也可以签名。可以认为签名的人越多，公钥越可信。密码学中，有一个概念是信任网络（Web of Trust）。它的提出者也是PGP的提出者Phil Zimmermann是这样说的：
+ As time goes on, you will accumulate keys from other people that you may want to designate as trusted introducers. Everyone else will each choose their own trusted introducers. And everyone will gradually accumulate and distribute with their key a collection of certifying signatures from other people, with the expectation that anyone receiving it will trust at least one or two of the signatures." />
+
+  <link
+    rel="stylesheet"
+    href="https://lib.baomitu.com/flexboxgrid/6.3.1/flexboxgrid.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://lib.baomitu.com/github-markdown-css/2.10.0/github-markdown.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://lib.baomitu.com/highlight.js/9.13.1/styles/tomorrow.min.css"
+  />
+  <link rel="stylesheet" href="/css/index.css">
+  <link href="/index.xml" rel="alternate" type="application/rss+xml" title="Fan Jingbo&#39;s Blog">
+  
+  <script>
+    
+
+    (function(undefined) {}).call('object' === typeof window && window || 'object' === typeof self && self || 'object' === typeof global && global || {});
+  </script>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132076423-1"></script><script src="https://fanjingbo.com/analytics.js"></script>
+</head>
+
+
+  <body>
+    <article class="post Chinese" id="article">
+      <div class="row">
+        <div class="col-xs-12 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3">
+          <a href="/">
+            <div class="head-line"></div>
+          </a>
+          <header class="post-header">
+            <h1 class="post-title">GPG牛刀小试</h1>
+            <div class="row">
+              <div class="col-xs-6">
+                <time class="post-date" datetime="2019-01-21 11:09:10 CST">
+                  21 Jan 2019
+                </time>
+              </div>
+              <div class="col-xs-6">
+                <div class="post-author">
+                  <a target="_blank" href="https://fanjingbo.com">@Fanjingbo</a>
+                </div>
+              </div>
+            </div>
+          </header>
+    
+          <div class="post-content markdown-body">
+            
+
+<h2 id="一-gpg简介">一、GPG简介</h2>
+
+<p>GPG（或GnuPG）是自由软件基金会（Free Software Foundation）开发的程  序，是基于商业加密软件PGP（Pretty Good Privacy）的作者（Phil Zimmermann）倡导提出的开放标准OpenPGP实现的，主要作用是加密，签名和生成非对称密钥对。</p>
+
+<h2 id="二-非对称加密与数字签名">二、非对称加密与数字签名</h2>
+
+<p>要知道什么是非对称加密，就要先知道什么是对称加密。对称加密就是加密和解密使用相同的密钥，或者两个可以简单地相互推算的密钥。比如，经典的凯撒密码，就是将字母表进行移位映射加密，A加密为B，B加密为C，这样，反向移位就可以解密。然而，对称加密如果密钥泄露，安全就不复存在了。非对称加密就可以解决这个问题。</p>
+
+<p>简单来说，非对称加密就是使用公钥加密传输，使用私钥解密。比如说Alice要向Bob传递信息，Bob要先生成非对称密钥对，自己保留私钥，给Alice公钥。Alice使用Bob的公钥加密信息，Bob拿到加密信息后，使用自己的私钥解密查看信息。这就避免了因为密钥丢失导致的安全问题。</p>
+
+<p>而数字签名，也是利用非对称加密技术的应用。首先，用Bob的私钥对文件加密（实际是文件的hash结果），加密的结果作为数字签名发送给Alice。Alice拿到数字签名和文件，使用Bob的公钥解密数字签名，将得到的结果与文件的hash结果作对比，如果一致，证明文件确实是Bob签署的。</p>
+
+<h2 id="三-gpg上手">三、GPG上手</h2>
+
+<p>本来我写了一些常用命令，后来发现没啥意思，命令随便一查就能查到。我就写一些比较有趣的东西吧。</p>
+
+<h3 id="1-keyring">1.Keyring</h3>
+
+<p>在密码学中，keyring存储的是key，十分形象，key的ring。在GPG中，如下命令：</p>
+
+<pre><code class="language-bash">gpg --list-keys
+</code></pre>
+
+<p>可以列出在keyring中的所有key。其实keyring可以看成一个通讯录，里面存储的key可以看做是一个个收件人的信息，消息的发送过程就可以类比成加密。</p>
+
+<h3 id="2-fingerprint">2.Fingerprint</h3>
+
+<p>由于公钥很长，所以使用fingerprint来指代对应的公钥，相当于公钥的ID。不过很多时候，使用公钥生成时输入的姓名和邮箱也可以找到对应的公钥，只不过不是一一对应的关系。</p>
+
+<h3 id="3-公钥签名-key-signing-和key-signing-party">3.公钥签名（Key Signing）和Key Signing Party</h3>
+
+<p>在非对称加密中，公钥的有效性十分重要。还是拿Alice和Bob举例子，如果Eve将自己的公钥伪装成Bob的公钥发送给Alice，那么Alice就会用Eve的公钥加密数据，Eve就可以使用自己的私钥解密得到数据。</p>
+
+<p>因此，如果利用数字签名技术，第三个人Dave可以使用他的私钥对Bob的公钥进行签名，表明他认可这个公钥的真实性，这样Alice就可以使用Dave的公钥验证出Dave对这个公钥进行了数字签名。这样Dave就类似于一个担保人，证明该公钥属于Bob。</p>
+
+<p>既然Dave可以签名，那么其他人也可以签名。可以认为签名的人越多，公钥越可信。密码学中，有一个概念是信任网络（Web of Trust）。它的提出者也是PGP的提出者Phil Zimmermann是这样说的：</p>
+
+<blockquote>
+<p>As time goes on, you will accumulate keys from other people that you may want to designate as trusted introducers. Everyone else will each choose their own trusted introducers. And everyone will gradually accumulate and distribute with their key a collection of certifying signatures from other people, with the expectation that anyone receiving it will trust at least one or two of the signatures. This will cause the emergence of <strong>a decentralized fault-tolerant web of confidence for all public keys</strong>.</p>
+</blockquote>
+
+<p>既然公钥签名这么好，那么如何找到为你的公钥签名的人呢？这就不得不提到一个神奇的东西——Key Signing Party. 最开始我看到它是在GPG的官方文档里，我还以为是一种幽默的说法，没想到这个party是真实存在的。根据<a href="https://en.wikipedia.org/wiki/Key_signing_party">维基百科</a>和<a href="https://wiki.ubuntu.com/KeySigningParty">Ubuntu Wiki</a>，在这个party上，一群人手里拿着小本子，记录下其他人的公钥fingerprint。然后回家之后，用自己的私钥为这些公钥签名，然后将这些签名后的公钥通过邮件发送给对应的接收人。甚至还有人开发了相关的<a href="https://tracker.debian.org/pkg/signing-party">工具包</a>来做这些事。
+<img src="/images/key_signing_party.jpeg" alt="key\_signing\_party" /></p>
+
+<h3 id="4-公钥分发">4.公钥分发</h3>
+
+<p>当你生成了自己的公钥，如何将公钥进行分发。当然，将公钥存在文件中传给别人是一个可选项：</p>
+
+<pre><code class="language-bash">gpg --armor --export you@example.com &gt; mykey.asc
+</code></pre>
+
+<p>但是，有一个更方便的方法——上传到key server：</p>
+
+<pre><code class="language-bash">gpg --keyserver pgp.mit.edu --send-keys [Fingerprint]
+</code></pre>
+
+<p>上传完成后，其他人就可以通过fingerprint来获取公钥：</p>
+
+<pre><code class="language-bash">gpg --keyserver pgp.mit.edu --recv-keys [Fingerprint]
+</code></pre>
+
+<p>签名后的公钥也可以上传到key server进行分发。</p>
+
+          </div>
+          
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://fanjingbo-com.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        </div>
+      </div>
+    </article>
+
+    <script src="/js/highlight.pack.js"></script>
+
+
+<script>
+  hljs.initHighlightingOnLoad();
+  
+  var posts = document.getElementById('posts-list');
+  posts && quicklink({
+    el: posts,
+    priority: true,
+  });
+</script>
+
+    
+
+  </body>
+</html>
