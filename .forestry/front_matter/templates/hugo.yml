@@ -19,3 +19,5 @@ fields:
   label: Url
   name: url
   default: "/post/--"
+pages:
+- content/post/ctf探秘-一-collision-pwnable-kr.md
