@@ -2,6 +2,7 @@ language: python
 python:
   - "3.6"
 install:
+  - cd blog-hugo
   - pip install -r requirements.txt
 script:
   - python upload_to_cos.py
