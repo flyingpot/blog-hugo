@@ -1,6 +1,7 @@
 from qcloud_cos import CosConfig
 from qcloud_cos import CosS3Client
 import os
+import time
 import sys
 import logging
 
@@ -28,7 +29,12 @@ if 'Contents' in response:
             Key=metadata['Key']
         )
 
-for root, _, files in os.walk("."):
+while not os.path.isdir('public'):
+    time.sleep(1)
+
+os.chdir('public')
+
+for root, _, files in os.walk('.'):
     for file in files:
         object = os.path.join(root, file)
 
