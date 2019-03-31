@@ -10,6 +10,8 @@ secret_id  = os.environ['SECRET_ID']
 secret_key = os.environ['SECRET_KEY']
 region = os.environ['REGION']
 bucket = os.environ['BUCKET']
+token = None
+scheme = 'https'
 
 config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key, Token=token, Scheme=scheme)
 
