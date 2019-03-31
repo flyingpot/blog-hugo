@@ -35,8 +35,9 @@ for root, _, files in os.walk('.'):
     for file in files:
         object = os.path.join(root, file)
 
-        response = client.put_object(
-            Bucket=bucket,
-            Body=object,
-            Key=object
-        )
+        with open(object, 'rb') as fp:
+            response = client.put_object(
+                Bucket=bucket,
+                Body=fp,
+                Key=object
+            )
