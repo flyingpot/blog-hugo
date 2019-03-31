@@ -29,9 +29,6 @@ if 'Contents' in response:
             Key=metadata['Key']
         )
 
-while not os.path.isdir('public'):
-    time.sleep(1)
-
 os.chdir('public')
 
 for root, _, files in os.walk('.'):
