@@ -21,11 +21,12 @@ response = client.list_objects(
     Bucket=bucket
 )
 
-for metadata in response['Contents']:
-    response = client.delete_object(
-        Bucket=bucket,
-        Key=metadata['Key']
-    )
+if 'Contents' in response:
+    for metadata in response['Contents']:
+        response = client.delete_object(
+            Bucket=bucket,
+            Key=metadata['Key']
+        )
 
 for root, _, files in os.walk("."):
     for file in files:
