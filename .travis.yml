@@ -1,7 +1,22 @@
-language: python
-python:
-  - "3.6"
-install:
-  - pip install -r requirements.txt
-script:
-  - python upload_to_cos.py
+matrix:
+  include:
+    - language: go
+      go:
+        - master
+      install:
+        - go get github.com/gohugoio/hugo
+      before_script:
+        - rm -rf public 2> /dev/null
+      script:
+        - hugo
+        
+    - language: python
+      python:
+        - "3.6"
+      install:
+        - pip install -r requirements.txt
+      script:
+        - cd public
+        - python upload_to_cos.py
+
+
