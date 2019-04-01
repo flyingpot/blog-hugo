@@ -146,3 +146,4 @@ python -c "print '\x00\x00\x00\x00'*4 + '\xec\x09\xdd\x21'"
 1. [ File Permissions and Attributes ](https://wiki.archlinux.org/index.php/File_permissions_and_attributes)
 2. [Setuid](https://en.wikipedia.org/wiki/Setuid)
 3. [深入理解计算机系统](https://book.douban.com/subject/1896753/)
+4. [What does ` (backquote/backtick) mean in commands?](https://unix.stackexchange.com/questions/27428/what-does-backquote-backtick-mean-in-commands)
