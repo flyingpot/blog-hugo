@@ -2,7 +2,7 @@ language: python
 python:
   - "3.6"
 install:
-  - wget -qO- https://api.github.com/repos/gohugoio/hugo/releases/latest | sed -r -n '/browser_download_url/{/Linux-64bit.deb/{s@[^:]*:[[:space:]]*"([^"]*)".*@\1@g;p;q}}' | xargs wget
+  - wget https://github.com/gohugoio/hugo/releases/download/v0.54.0/hugo_0.54.0_Linux-64bit.deb
   - sudo dpkg -i hugo*.deb
   - rm -rf public 2> /dev/null
   - pip install -r requirements.txt
