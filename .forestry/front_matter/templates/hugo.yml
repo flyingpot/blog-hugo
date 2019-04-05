@@ -15,4 +15,5 @@ fields:
   name: url
   label: Url
 pages:
+- content/post/travis-ci自动部署博客到腾讯云cos.md
 - content/post/ctf探秘-一-collision-pwnable-kr.md
