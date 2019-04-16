@@ -33,18 +33,16 @@ script:
 
 可以看到，配置文件中可以设置语言和版本，安装依赖并且运行脚本，相当的自由。我们的构建环境需要Go和Python两个环境（需要hugo生成静态文件，需要Python上传静态文件到腾讯COS），Travis CI是可以使用两种语言环境的，如下：
 
-```
-matrix:
-  include:
-    - language: go
-      ...
-    - language: python
-      ...
-```
+    matrix:
+      include:
+        - language: go
+          ...
+        - language: python
+          ...
 
 但是在尝试的过程中遇到了两个问题，一个是golang和hugo在Travis CI中的构建过程太慢
 
-![go](./go_slow.png)
+![](/images/go_slow.png)
 
 另一个问题就很严重了，Travis CI不支持两种语言环境先后构建，只支持的是多语言同时构建。这样就没法满足我的要求。由于我更熟悉Python，所以选择了Python这一种语言环境进行构建。
 
@@ -109,6 +107,7 @@ for root, _, files in os.walk('.'):
 ```
 
 最终的.travis.yml如下：
+
 ```yaml
 language: python
 python:
