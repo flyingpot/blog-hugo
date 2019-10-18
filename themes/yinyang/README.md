@@ -17,9 +17,37 @@
 
 ## Installation
 
-[Install and Use Theme](https://gohugo.io/themes/installing-and-using-themes/)
+From the root of your site:
+
+```shell
+git clone git@github.com:joway/hugo-theme-yinyang.git themes/yinyang
+```
+
+Change `config.toml`:
+
+```toml
+theme = "yinyang"
+```
 
 ## Configuration
+
+### Head Title
+
+```
+[params]
+headTitle = "Joway Wang"
+```
+
+If there is no `headTitle` in params, use `.Site.Author.name`.
+
+### Main section
+
+Set your main section:
+
+```
+[params]
+mainSections = ["posts"]
+```
 
 ### Multi-Language
 
@@ -65,7 +93,7 @@ theme = "yinyang"
 DefaultContentLanguage = "cn"
 
 [author]
-  name = "Joway Wang"
+  name = "Joway"
   homepage = "https://joway.io/"
 
 [languages]
@@ -79,8 +107,10 @@ DefaultContentLanguage = "cn"
     weight = 2
 
 [params]
+mainSections = ["posts"]
+headTitle = "Joway Wang"
 disqus = "joway" # disqus account name
-extraHead = '<script async src="https://www.googletagmanager.com/gtag/js?id=UA-53624533-8"></script><script src="https://joway.io/analytics.js"></script>'
+extraHead = '<script async src="https://www.googletagmanager.com/gtag/js?id=UA-xxx"></script>'
 [[params.socials]]
 name = "About Me"
 link = "https://joway.io"
