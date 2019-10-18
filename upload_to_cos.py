@@ -33,10 +33,11 @@ os.chdir('public')
 for root, _, files in os.walk('.'):
     for file in files:
         object = os.path.join(root, file)
-
         with open(object, 'rb') as fp:
             response = client.put_object(
                 Bucket=bucket,
                 Body=fp,
-                Key=object
+                Key=object,
+                StorageClass='STANDARD',
+                EnableMD5=False
             )
