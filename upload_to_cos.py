@@ -37,7 +37,5 @@ for root, _, files in os.walk('.'):
             response = client.put_object(
                 Bucket=bucket,
                 Body=fp,
-                Key=object,
-                StorageClass='STANDARD',
-                EnableMD5=False
+                Key=object
             )
