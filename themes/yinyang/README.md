@@ -83,14 +83,6 @@ link = "https://github.com/joway"
 extraHead = '<script src="xxxx.js"></script>'
 ```
 
-### Insert content on every post
-
-```
-[params]
-postHeaderContent = ""
-postFooterContent = "<br/><br/><p>Subscribe：<a target='_blank' href='https://mailchi.mp/a1a0d59e7a19/joway'>Joway's Blog</a></p>"
-```
-
 ### Example
 
 ```
@@ -125,6 +117,4 @@ link = "https://joway.io"
 [[params.socials]]
 name = "Github"
 link = "https://github.com/joway"
-postHeaderContent = ""
-postFooterContent = "<br/><br/><p>Subscribe to：<a target='_blank' href='https://mailchi.mp/a1a0d59e7a19/joway'>Joway's Blog</a></p>"
 ```
