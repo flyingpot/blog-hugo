@@ -12,8 +12,6 @@ jobs:
       uses: peaceiris/actions-hugo@v2
       with:
         hugo-version: 'latest'
-    - name: Build
-      run: hugo --minify
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
@@ -26,6 +24,6 @@ jobs:
         pip install coscmd
     - name: deploy
       run: |
-        $HOME/bin/hugo
+        hugo --minify
         coscmd config -a ${{ secrets.SecretId }} -s ${{ secrets.SecretKey }} -b ${{ secrets.BucketName }} -r ${{ secrets.BucketRegion }} -m 10
         coscmd upload -r -s public/ /
