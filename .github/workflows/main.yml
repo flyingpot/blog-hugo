@@ -8,18 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2   
-    - name: Set up Go
-      uses: actions/setup-go@v1.0.0
+    - name: Setup Hugo
+      uses: peaceiris/actions-hugo@v2
       with:
-        version: 1.13.5
-    - name: Install Hugo
-      run: |
-        export GOPATH=$HOME
-        mkdir $HOME/src
-        cd $HOME/src
-        git clone https://github.com/gohugoio/hugo.git
-        cd hugo
-        go install
+        hugo-version: 'latest'
+    - name: Build
+      run: hugo --minify
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
