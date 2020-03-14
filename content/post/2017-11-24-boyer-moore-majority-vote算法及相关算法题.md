@@ -1,21 +1,21 @@
 ---
 title: Boyer-Moore Majority Vote算法及相关算法题
 author: flyingpot
-type: post
-date: 2017-11-24T12:35:46+08:00
-url: /post/boyer_moore_majority_vote
+date: 2017-11-24T04:35:46.000+00:00
+url: "/post/boyer_moore_majority_vote"
+
 ---
 ## 一、算法简介
 
 Boyer-Moore Majority Vote算法（以下简称BMMV算法）是用来在一系列元素中查找主要元素的算法，具有O(n)的时间复杂度和O(1)的空间复杂度。该算法在1981年由Robert S. Boyer和J Strother Moore提出。
 
-> Tips: Robert S. Boyer和J Strother Moore两人在1977年提出了Boyer-Moore字符串搜索算法，也是一个很经典的算法 
+> Tips: Robert S. Boyer和J Strother Moore两人在1977年提出了Boyer-Moore字符串搜索算法，也是一个很经典的算法
 
 ## 二、问题描述
 
 ### 1. Leetcode 169 (Majority Element)
 
-> 给定含有n个元素的数组，寻找其主元素（出现超过n/2下界次的元素） 
+> 给定含有n个元素的数组，寻找其主元素（出现超过n/2下界次的元素）
 
 #### **题解：**
 
@@ -51,11 +51,11 @@ class Solution:
 
 ### 2. Leetcode 229 (Majority Element II)
 
-> 给定含有n个元素的数组，寻找所有出现超过n/3下界次的元素 
+> 给定含有n个元素的数组，寻找所有出现超过n/3下界次的元素
 
 #### **题解：**
 
-> Tips: 最多存在两个所求元素 
+> Tips: 最多存在两个所求元素
 
 BMMV算法代码如下
 
@@ -100,7 +100,7 @@ BMMV算法可以看做是主元素相关问题的特解，而如果主元素个�
 Lintcode类似题的主元素个数的下界分别为n/2、n/3、n/k，并且加上了条件'There is only one majority number in the array'，这么一改题目立马变得很low，因为只要找到数组中出现最多的元素就可以了，代码如下：
 
 ```python
-class="python">class Solution:
+class Solution:
     def majorityElement(self, nums):
         counts = collections.Counter(nums)
         return max(counts.keys(), key=counts.get)
@@ -108,9 +108,6 @@ class="python">class Solution:
 
 #### 参考链接
 
-1.[Majority Voting Algorithm][1]
-  
-2.[Boyer–Moore majority vote algorithm (Wiki)][2]
+1\.[Majority Voting Algorithm](https://gregable.com/2013/10/majority-vote-algorithm-find-majority.html)
 
-[1]:	https://gregable.com/2013/10/majority-vote-algorithm-find-majority.html
-[2]:	https://en.wikipedia.org/wiki/Boyer%E2%80%93Moore_majority_vote_algorithm
+2\.[Boyer–Moore majority vote algorithm (Wiki)](https://en.wikipedia.org/wiki/Boyer%E2%80%93Moore_majority_vote_algorithm)
