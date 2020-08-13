@@ -1,12 +1,12 @@
 +++
-date = "2019-03-11T16:00:00+00:00"
-title = "CTF探秘（一）—— collision (pwnable.kr)"
+date = 2019-03-11T16:00:00Z
+title = "CTF从零单排（一）—— collision (pwnable.kr)"
 url = "/post/ctf1"
 
 +++
 # 一、前言
 
-最近突然对CTF产生了兴趣，感觉能从中学到很多东西。所以我打算写一系列文章记录在刷题过程中学到的知识。
+最近突然对CTF产生了兴趣，感觉能从中学到很多东西。并且我发现很多关于CTF的解法文章对我这样的小白很不友好，因此我打算新开一坑，从零基础的角度详细地记录一下CTF的题解。
 
 # 二、题目及分析
 
@@ -146,4 +146,4 @@ python -c "print '\x00\x00\x00\x00'*4 + '\xec\x09\xdd\x21'"
 1. [ File Permissions and Attributes ](https://wiki.archlinux.org/index.php/File_permissions_and_attributes)
 2. [Setuid](https://en.wikipedia.org/wiki/Setuid)
 3. [深入理解计算机系统](https://book.douban.com/subject/1896753/)
-4. [What does ` (backquote/backtick) mean in commands?](https://unix.stackexchange.com/questions/27428/what-does-backquote-backtick-mean-in-commands)
+4. [What does \` (backquote/backtick) mean in commands?](https://unix.stackexchange.com/questions/27428/what-does-backquote-backtick-mean-in-commands)
