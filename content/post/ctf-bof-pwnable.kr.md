@@ -8,8 +8,6 @@ url = "ctf2"
 
 查看题目给出的信息，一个C代码文件和一个可执行文件，C代码文件如下：
 
-\`\`\`c
-
     #include <stdio.h>
     #include <string.h>
     #include <stdlib.h>
@@ -28,8 +26,6 @@ url = "ctf2"
     	func(0xdeadbeef);
     	return 0;
     }
-
-\`\`\`
 
 可以看出这道题考的是栈溢出，从标准输入读取的数据覆盖掉func传入的参数值即可提权。关键问题就是如何构造这个数据。
 
