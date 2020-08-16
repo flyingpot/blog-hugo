@@ -4,8 +4,6 @@ title = "CTF从零单排（二）—— bof (pwnable.kr)"
 url = "ctf2"
 
 +++
-# CTF从零单排（一）—— bof (pwnable.kr)
-
 # 一、题目分析
 
 查看题目给出的信息，一个C代码文件和一个可执行文件，C代码文件如下：
