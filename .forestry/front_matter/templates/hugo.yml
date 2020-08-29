@@ -17,5 +17,6 @@ fields:
 pages:
 - content/post/ctf-bof-pwnable.kr.md
 - content/post/ctf探秘-一-collision-pwnable-kr.md
+- content/post/hashset.md
 - content/post/travis-ci自动部署博客到腾讯云cos.md
 - content/post/刷题专题总结-链表篇.md
