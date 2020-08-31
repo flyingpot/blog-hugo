@@ -25,7 +25,7 @@ jobs:
     - name: Update theme
       run: |
         rm -rf themes/yinyang
-        git clone https://github.com:joway/hugo-theme-yinyang.git themes/yinyang
+        git clone https://github.com/joway/hugo-theme-yinyang.git themes/yinyang
     - name: deploy
       run: |
         hugo --minify
