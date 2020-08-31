@@ -22,10 +22,6 @@ jobs:
     - name: Install coscmd
       run: |
         pip install coscmd
-    - name: Update theme
-      run: |
-        rm -rf themes/yinyang
-        git clone git@github.com:joway/hugo-theme-yinyang.git themes/yinyang
     - name: deploy
       run: |
         hugo --minify
