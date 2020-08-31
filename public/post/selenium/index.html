@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Hugo 0.58.3" />
+  <meta name="generator" content="Hugo 0.74.3" />
 
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,7 +19,7 @@
       "articleSection" : "post",
       "name" : "Selenium踩坑记",
       "headline" : "Selenium踩坑记",
-      "description" : "一、前言 Selenium是一个浏览器自动化测试工具，支持所有主流的浏览器，并且有各种语言的接口，也就是说通过写代码就可以模拟各种浏览器操作。我主要是用Selenium写一个小脚本，实现某交易平台上的自动场外交易。\n Selenium也有化学元素硒的意思\n 二、环境配置 配置Selenium需要三个组件，一个是Selenium Client API，一个是WebDriver，最后是浏览器。简单来说就是API控制WebDriver，WebDriver控制浏览器，来实现通过代码对浏览器进行操作，流程十分清晰。\n首先是Selenium，由于我只会Python(哭)，所以我选择安装Python版本的Selenium\npip install selenium  虚拟环境配置就不再赘述了。\n然后是WebDriver，不同的浏览器对应的WebDriver也不同。我这次使用的是Firefox，对应的WebDriver叫geckodriver(https:\/\/github.com\/mozilla\/geckodriver\/releases)，下载下来扔到环境变量里即可。\n最后也是最简单的——浏览器，四大主流浏览器(Chrome, Edge, Firefox, Safari）全都支持，看你喜好选择。注意WebDriver和浏览器版本要对得上，都升到最新版本就行。\n三个组件都装好了，测试一下，打开Python解释器，输入以下代码：\nfrom selenium import webdriver driver = webdriver.Firefox() driver.get(\x26quot;https:\/\/fanjingbo.com\x26quot;)  如果能弹出浏览器并成功加载网页，说明环境配置成功。\n三、Selenium实战 Selenium基本上能实现任何对浏览器的操作，在这里只讨论一些常用方法。\n driver.get   driver.get方法能使浏览器跳转到相应的网址，并且默认是等所有元素加载完毕语句才结束\n driver.refresh   driver.refresh能刷新页面，一般用于多次获取某页面里的数据。这里有一个小技巧，现在的页面大多是局部刷新的，我们需要的数据并不需要刷新整个页面，用refresh方法既慢也没必要，所以有时候根据实际情况，可以通过多次调用driver.get方法来实现快速刷新。\n driver.find_element_by_*\\*   对浏览器进行操作一定少不了元素的定位，这个方法可以用各种方式来定位元素，比如xpath，css selector等等。定位完之后，可以用click()来点击，send_keys()来填充表单\n WebDriverWait   比如填充了登录表单，点击了登录按钮，这个时候我们不能对新页面进行操作，因为页面还没有加载完毕。有两种解决方法，一种是直接设置等待几秒钟，Selenium有implicitly_wait()方法，或者直接time.sleep()也可以，但是这种方式存在问题：如果网络有问题，页面加载非常缓慢的话，这种方式就失效了。所以一般都采用第二种方法WebDriverWait，例子如下：\nfrom selenium.webdriver.support.wait import WebDriverWait from selenium.webdriver.support import expected_conditions as expected from selenium.webdriver.common.by import By wb = webdriver.",
+      "description" : "一、前言 Selenium是一个浏览器自动化测试工具，支持所有主流的浏览器，并且有各种语言的接口，也就是说通过写代码就可以模拟各种浏览器操作。我主要是用Selenium写一个小脚本，实现某交易平台上的自动场外交易。\n Selenium也有化学元素硒的意思\n 二、环境配置 配置Selenium需要三个组件，一个是Selenium Client API，一个是WebDriver，最后是浏览器。简单来说就是API控制WebDriver，WebDriver控制浏览器，来实现通过代码对浏览器进行操作，流程十分清晰。\n首先是Selenium，由于我只会Python(哭)，所以我选择安装Python版本的Selenium\npip install selenium 虚拟环境配置就不再赘述了。\n然后是WebDriver，不同的浏览器对应的WebDriver也不同。我这次使用的是Firefox，对应的WebDriver叫geckodriver(https:\/\/github.com\/mozilla\/geckodriver\/releases)，下载下来扔到环境变量里即可。\n最后也是最简单的——浏览器，四大主流浏览器(Chrome, Edge, Firefox, Safari）全都支持，看你喜好选择。注意WebDriver和浏览器版本要对得上，都升到最新版本就行。\n三个组件都装好了，测试一下，打开Python解释器，输入以下代码：\nfrom selenium import webdriver driver = webdriver.Firefox() driver.get(\u0026#34;https:\/\/fanjingbo.com\u0026#34;) 如果能弹出浏览器并成功加载网页，说明环境配置成功。\n三、Selenium实战 Selenium基本上能实现任何对浏览器的操作，在这里只讨论一些常用方法。\n driver.get  driver.get方法能使浏览器跳转到相应的网址，并且默认是等所有元素加载完毕语句才结束\ndriver.refresh  driver.refresh能刷新页面，一般用于多次获取某页面里的数据。这里有一个小技巧，现在的页面大多是局部刷新的，我们需要的数据并不需要刷新整个页面，用refresh方法既慢也没必要，所以有时候根据实际情况，可以通过多次调用driver.get方法来实现快速刷新。\ndriver.find_element_by_*\\*  对浏览器进行操作一定少不了元素的定位，这个方法可以用各种方式来定位元素，比如xpath，css selector等等。定位完之后，可以用click()来点击，send_keys()来填充表单\nWebDriverWait  比如填充了登录表单，点击了登录按钮，这个时候我们不能对新页面进行操作，因为页面还没有加载完毕。有两种解决方法，一种是直接设置等待几秒钟，Selenium有implicitly_wait()方法，或者直接time.sleep()也可以，但是这种方式存在问题：如果网络有问题，页面加载非常缓慢的话，这种方式就失效了。所以一般都采用第二种方法WebDriverWait，例子如下：\nfrom selenium.webdriver.support.wait import WebDriverWait from selenium.webdriver.support import expected_conditions as expected from selenium.webdriver.common.by import By wb = webdriver.Firefox() wb.get(\u0026#39;https:\/\/fanjingbo.com\u0026#39;) wait = WebDriverWait(wb, timeout=10) wait.until(expected.visibility_of_element_located((By.XPATH, \u0026#34;---相应的xpath---\u0026#34;))) 代码实现的就是对应xpath的元素出现之前一直等待。",
       "inLanguage" : "en-US",
       "author" : "Fanjingbo",
       "creator" : "Fanjingbo",
@@ -27,8 +27,8 @@
       "accountablePerson" : "Fanjingbo",
       "copyrightHolder" : "Fanjingbo",
       "copyrightYear" : "2018",
-      "datePublished": "2018-02-28 03:39:05 \x2b0800 CST",
-      "dateModified" : "2018-02-28 03:39:05 \x2b0800 CST",
+      "datePublished": "2018-02-28 03:39:05 \u002b0800 CST",
+      "dateModified" : "2018-02-28 03:39:05 \u002b0800 CST",
       "url" : "https:\/\/fanjingbo.com\/post\/selenium\/",
       "keywords" : [  ]
   }
@@ -40,17 +40,17 @@
  Selenium也有化学元素硒的意思
  二、环境配置 配置Selenium需要三个组件，一个是Selenium Client API，一个是WebDriver，最后是浏览器。简单来说就是API控制WebDriver，WebDriver控制浏览器，来实现通过代码对浏览器进行操作，流程十分清晰。
 首先是Selenium，由于我只会Python(哭)，所以我选择安装Python版本的Selenium
-pip install selenium  虚拟环境配置就不再赘述了。
+pip install selenium 虚拟环境配置就不再赘述了。
 然后是WebDriver，不同的浏览器对应的WebDriver也不同。我这次使用的是Firefox，对应的WebDriver叫geckodriver(https://github.com/mozilla/geckodriver/releases)，下载下来扔到环境变量里即可。
 最后也是最简单的——浏览器，四大主流浏览器(Chrome, Edge, Firefox, Safari）全都支持，看你喜好选择。注意WebDriver和浏览器版本要对得上，都升到最新版本就行。
 三个组件都装好了，测试一下，打开Python解释器，输入以下代码：
-from selenium import webdriver driver = webdriver.Firefox() driver.get(&quot;https://fanjingbo.com&quot;)  如果能弹出浏览器并成功加载网页，说明环境配置成功。
+from selenium import webdriver driver = webdriver.Firefox() driver.get(&#34;https://fanjingbo.com&#34;) 如果能弹出浏览器并成功加载网页，说明环境配置成功。
 三、Selenium实战 Selenium基本上能实现任何对浏览器的操作，在这里只讨论一些常用方法。
- driver.get   driver.get方法能使浏览器跳转到相应的网址，并且默认是等所有元素加载完毕语句才结束
- driver.refresh   driver.refresh能刷新页面，一般用于多次获取某页面里的数据。这里有一个小技巧，现在的页面大多是局部刷新的，我们需要的数据并不需要刷新整个页面，用refresh方法既慢也没必要，所以有时候根据实际情况，可以通过多次调用driver.get方法来实现快速刷新。
- driver.find_element_by_*\*   对浏览器进行操作一定少不了元素的定位，这个方法可以用各种方式来定位元素，比如xpath，css selector等等。定位完之后，可以用click()来点击，send_keys()来填充表单
- WebDriverWait   比如填充了登录表单，点击了登录按钮，这个时候我们不能对新页面进行操作，因为页面还没有加载完毕。有两种解决方法，一种是直接设置等待几秒钟，Selenium有implicitly_wait()方法，或者直接time.sleep()也可以，但是这种方式存在问题：如果网络有问题，页面加载非常缓慢的话，这种方式就失效了。所以一般都采用第二种方法WebDriverWait，例子如下：
-from selenium.webdriver.support.wait import WebDriverWait from selenium.webdriver.support import expected_conditions as expected from selenium.webdriver.common.by import By wb = webdriver." />
+ driver.get  driver.get方法能使浏览器跳转到相应的网址，并且默认是等所有元素加载完毕语句才结束
+driver.refresh  driver.refresh能刷新页面，一般用于多次获取某页面里的数据。这里有一个小技巧，现在的页面大多是局部刷新的，我们需要的数据并不需要刷新整个页面，用refresh方法既慢也没必要，所以有时候根据实际情况，可以通过多次调用driver.get方法来实现快速刷新。
+driver.find_element_by_*\*  对浏览器进行操作一定少不了元素的定位，这个方法可以用各种方式来定位元素，比如xpath，css selector等等。定位完之后，可以用click()来点击，send_keys()来填充表单
+WebDriverWait  比如填充了登录表单，点击了登录按钮，这个时候我们不能对新页面进行操作，因为页面还没有加载完毕。有两种解决方法，一种是直接设置等待几秒钟，Selenium有implicitly_wait()方法，或者直接time.sleep()也可以，但是这种方式存在问题：如果网络有问题，页面加载非常缓慢的话，这种方式就失效了。所以一般都采用第二种方法WebDriverWait，例子如下：
+from selenium.webdriver.support.wait import WebDriverWait from selenium.webdriver.support import expected_conditions as expected from selenium.webdriver.common.by import By wb = webdriver.Firefox() wb.get(&#39;https://fanjingbo.com&#39;) wait = WebDriverWait(wb, timeout=10) wait.until(expected.visibility_of_element_located((By.XPATH, &#34;---相应的xpath---&#34;))) 代码实现的就是对应xpath的元素出现之前一直等待。" />
 
   <link rel="stylesheet" href="https://unpkg.com/flexboxgrid@6.3.1/dist/flexboxgrid.min.css" />
   <link rel="stylesheet"
@@ -111,96 +111,57 @@ from selenium.webdriver.support.wait import WebDriverWait from selenium.webdrive
         </header>
 
         <div class="post-content markdown-body">
-          
-
-<h2 id="一-前言">一、前言</h2>
-
+          <h2 id="一前言">一、前言</h2>
 <p>Selenium是一个浏览器自动化测试工具，支持所有主流的浏览器，并且有各种语言的接口，也就是说通过写代码就可以模拟各种浏览器操作。我主要是用Selenium写一个小脚本，实现某交易平台上的自动场外交易。</p>
-
 <blockquote>
 <p>Selenium也有化学元素硒的意思</p>
 </blockquote>
-
-<h2 id="二-环境配置">二、环境配置</h2>
-
+<h2 id="二环境配置">二、环境配置</h2>
 <p>配置Selenium需要三个组件，一个是Selenium Client API，一个是WebDriver，最后是浏览器。简单来说就是API控制WebDriver，WebDriver控制浏览器，来实现通过代码对浏览器进行操作，流程十分清晰。</p>
-
 <p>首先是Selenium，由于我只会Python(哭)，所以我选择安装Python版本的Selenium</p>
-
-<pre><code class="language-python">pip install selenium
-</code></pre>
-
-<p>虚拟环境配置就不再赘述了。</p>
-
-<p>然后是WebDriver，不同的浏览器对应的WebDriver也不同。我这次使用的是Firefox，对应的WebDriver叫geckodriver(<a href="https://github.com/mozilla/geckodriver/releases)，下载下来扔到环境变量里即可。">https://github.com/mozilla/geckodriver/releases)，下载下来扔到环境变量里即可。</a></p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">pip install selenium
+</code></pre></div><p>虚拟环境配置就不再赘述了。</p>
+<p>然后是WebDriver，不同的浏览器对应的WebDriver也不同。我这次使用的是Firefox，对应的WebDriver叫geckodriver(<a href="https://github.com/mozilla/geckodriver/releases">https://github.com/mozilla/geckodriver/releases</a>)，下载下来扔到环境变量里即可。</p>
 <p>最后也是最简单的——浏览器，四大主流浏览器(Chrome, Edge, Firefox, Safari）全都支持，看你喜好选择。注意WebDriver和浏览器版本要对得上，都升到最新版本就行。</p>
-
 <p>三个组件都装好了，测试一下，打开Python解释器，输入以下代码：</p>
-
-<pre><code class="language-python">from selenium import webdriver
-driver = webdriver.Firefox()
-driver.get(&quot;https://fanjingbo.com&quot;)
-</code></pre>
-
-<p>如果能弹出浏览器并成功加载网页，说明环境配置成功。</p>
-
-<h2 id="三-selenium实战">三、Selenium实战</h2>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> selenium <span style="color:#f92672">import</span> webdriver
+driver <span style="color:#f92672">=</span> webdriver<span style="color:#f92672">.</span>Firefox()
+driver<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;https://fanjingbo.com&#34;</span>)
+</code></pre></div><p>如果能弹出浏览器并成功加载网页，说明环境配置成功。</p>
+<h2 id="三selenium实战">三、Selenium实战</h2>
 <p>Selenium基本上能实现任何对浏览器的操作，在这里只讨论一些常用方法。</p>
-
 <ol>
-<li>driver.get
-<br /></li>
+<li>driver.get</li>
 </ol>
-
 <p>driver.get方法能使浏览器跳转到相应的网址，并且默认是等所有元素加载完毕语句才结束</p>
-
-<ol>
-<li>driver.refresh
-<br /></li>
+<ol start="2">
+<li>driver.refresh</li>
 </ol>
-
 <p>driver.refresh能刷新页面，一般用于多次获取某页面里的数据。这里有一个小技巧，现在的页面大多是局部刷新的，我们需要的数据并不需要刷新整个页面，用refresh方法既慢也没必要，所以有时候根据实际情况，可以通过多次调用driver.get方法来实现快速刷新。</p>
-
-<ol>
-<li>driver.find_element_by_*\*
-<br /></li>
+<ol start="2">
+<li>driver.find_element_by_*\*</li>
 </ol>
-
 <p>对浏览器进行操作一定少不了元素的定位，这个方法可以用各种方式来定位元素，比如xpath，css selector等等。定位完之后，可以用click()来点击，send_keys()来填充表单</p>
-
-<ol>
-<li>WebDriverWait
-<br /></li>
+<ol start="3">
+<li>WebDriverWait</li>
 </ol>
-
 <p>比如填充了登录表单，点击了登录按钮，这个时候我们不能对新页面进行操作，因为页面还没有加载完毕。有两种解决方法，一种是直接设置等待几秒钟，Selenium有implicitly_wait()方法，或者直接time.sleep()也可以，但是这种方式存在问题：如果网络有问题，页面加载非常缓慢的话，这种方式就失效了。所以一般都采用第二种方法WebDriverWait，例子如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> selenium.webdriver.support.wait <span style="color:#f92672">import</span> WebDriverWait
+<span style="color:#f92672">from</span> selenium.webdriver.support <span style="color:#f92672">import</span> expected_conditions <span style="color:#66d9ef">as</span> expected
+<span style="color:#f92672">from</span> selenium.webdriver.common.by <span style="color:#f92672">import</span> By
 
-<pre><code class="language-python">from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as expected
-from selenium.webdriver.common.by import By
-
-wb = webdriver.Firefox()
-wb.get('https://fanjingbo.com')
-wait = WebDriverWait(wb, timeout=10)
-wait.until(expected.visibility_of_element_located((By.XPATH, &quot;---相应的xpath---&quot;)))
-</code></pre>
-
-<p>代码实现的就是对应xpath的元素出现之前一直等待。</p>
-
+wb <span style="color:#f92672">=</span> webdriver<span style="color:#f92672">.</span>Firefox()
+wb<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;https://fanjingbo.com&#39;</span>)
+wait <span style="color:#f92672">=</span> WebDriverWait(wb, timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>)
+wait<span style="color:#f92672">.</span>until(expected<span style="color:#f92672">.</span>visibility_of_element_located((By<span style="color:#f92672">.</span>XPATH, <span style="color:#e6db74">&#34;---相应的xpath---&#34;</span>)))
+</code></pre></div><p>代码实现的就是对应xpath的元素出现之前一直等待。</p>
 <p>有了上面这些基础，再去看看文档，就会发现Selenium其实很简单，复杂的是你需要用css_selector、xpath等定位元素，要在浏览器中不停调试。</p>
-
-<h2 id="四-小插曲">四、小插曲</h2>
-
+<h2 id="四小插曲">四、小插曲</h2>
 <p>PhantomJS是一个WebKit内核的无界面浏览器引擎。网络上各种Selenium爬虫教程都是基于PhantomJS做的，然而当我打算使用PhantomJS来配合Selenium时，却看到这样一个warning</p>
-
 <blockquote>
 <p>Selenium support for PhantomJS has been deprecated, please use headless versions of Chrome or Firefox instead</p>
 </blockquote>
-
 <p>我查了一下，Selenium不再支持PhantomJS有两个原因：一个是Firefox和Chrome都有了自己的headless模式，PhantomJS寿命将尽；另一个是PhantomJS的driver从2014年就停止更新了，很多新标准都无法支持。</p>
-
 <p>笔者在写下此文时，虽然会有warning，但PhantomJS仍被Selenium支持。但是以后PhantomJS肯定会被移除。心疼PhantomJS。</p>
 
         </div>
@@ -239,6 +200,10 @@ wait.until(expected.visibility_of_element_located((By.XPATH, &quot;---相应的x
         
 
         <div class="site-footer">
+  
+  <div class="site-footer-item">
+    <a href="http://beian.miit.gov.cn" target="_blank">粤ICP备18020202号-1</a>
+  </div>
   
   <div class="site-footer-item">
     <a href="https://github.com/flyingpot" target="_blank">Github</a>

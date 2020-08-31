@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Hugo 0.58.3" />
+  <meta name="generator" content="Hugo 0.74.3" />
 
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,7 +19,7 @@
       "articleSection" : "post",
       "name" : "[Leetcode] Heaters",
       "headline" : "[Leetcode] Heaters",
-      "description" : " 一、题目描述 链接\n二、题目分析 有两个数组，一个数组代表house位置，另一个代表heater位置。这种类型题一般来说都是固定一个数组，遍历另一个数组。固定house，遍历heater明显不对。因为heater的相互位置没有考虑，结果一定偏大。以下图为例，两个数组分别为：[0, 3], [1, 2]，如果分别遍历1和2，则结果至少是2，实际应该是1.所以应该固定heater，遍历house。\n思路确定之后，解法就很明显了。解法一：对每个house位置，用二分法找到最近的heater位置，最后取位置的最大值即为解，因为用了二分法，所以heater数组需要先进行排序。解法二：把house和heater两个数组都进行排序，然后遍历house，每次记住最近的heater位置，下次遍历时从记住的位置开始，最后取位置最大值为解。\n三、代码 解法一： heaters.sort() res = 0 for house in houses: start = 0 end = len(heaters) - 1 while start \x2b 1 \x26amp;lt; end: mid = start \x2b (end - start) \/ 2 if heaters[mid] \x26gt; house: end = mid else: start = mid res = max(res, min(abs(house - heaters[start]), abs(heaters[end] - house))) return res  解法二： houses.sort() heaters.sort() i, res = 0, 0 for house in houses: while i \x26amp;lt; len(heaters) - 1 and heaters[i] \x2b heaters[i \x2b 1] \x26amp;lt;= house * 2: i \x2b= 1 res = max(res, abs(heaters[i] - house)) return res  ",
+      "description" : "一、题目描述 链接\n二、题目分析 有两个数组，一个数组代表house位置，另一个代表heater位置。这种类型题一般来说都是固定一个数组，遍历另一个数组。固定house，遍历heater明显不对。因为heater的相互位置没有考虑，结果一定偏大。以下图为例，两个数组分别为：[0, 3], [1, 2]，如果分别遍历1和2，则结果至少是2，实际应该是1.所以应该固定heater，遍历house。\n思路确定之后，解法就很明显了。解法一：对每个house位置，用二分法找到最近的heater位置，最后取位置的最大值即为解，因为用了二分法，所以heater数组需要先进行排序。解法二：把house和heater两个数组都进行排序，然后遍历house，每次记住最近的heater位置，下次遍历时从记住的位置开始，最后取位置最大值为解。\n三、代码 解法一： heaters.sort() res = 0 for house in houses: start = 0 end = len(heaters) - 1 while start \u002b 1 \u0026amp;lt; end: mid = start \u002b (end - start) \/ 2 if heaters[mid] \u0026gt; house: end = mid else: start = mid res = max(res, min(abs(house - heaters[start]), abs(heaters[end] - house))) return res 解法二： houses.sort() heaters.sort() i, res = 0, 0 for house in houses: while i \u0026amp;lt; len(heaters) - 1 and heaters[i] \u002b heaters[i \u002b 1] \u0026amp;lt;= house * 2: i \u002b= 1 res = max(res, abs(heaters[i] - house)) return res ",
       "inLanguage" : "en-US",
       "author" : "Fanjingbo",
       "creator" : "Fanjingbo",
@@ -27,8 +27,8 @@
       "accountablePerson" : "Fanjingbo",
       "copyrightHolder" : "Fanjingbo",
       "copyrightYear" : "2018",
-      "datePublished": "2018-02-05 01:44:15 \x2b0800 CST",
-      "dateModified" : "2018-02-05 01:44:15 \x2b0800 CST",
+      "datePublished": "2018-02-05 01:44:15 \u002b0800 CST",
+      "dateModified" : "2018-02-05 01:44:15 \u002b0800 CST",
       "url" : "https:\/\/fanjingbo.com\/post\/leetcode_heaters\/",
       "keywords" : [  ]
   }
@@ -36,10 +36,10 @@
 <title>[Leetcode] Heaters - Fan Jingbo&#39;s Blog</title>
   <meta property="og:title" content="[Leetcode] Heaters - Fan Jingbo&#39;s Blog" />
   <meta property="og:type" content="article" />
-  <meta name="description" content=" 一、题目描述 链接
+  <meta name="description" content="一、题目描述 链接
 二、题目分析 有两个数组，一个数组代表house位置，另一个代表heater位置。这种类型题一般来说都是固定一个数组，遍历另一个数组。固定house，遍历heater明显不对。因为heater的相互位置没有考虑，结果一定偏大。以下图为例，两个数组分别为：[0, 3], [1, 2]，如果分别遍历1和2，则结果至少是2，实际应该是1.所以应该固定heater，遍历house。
 思路确定之后，解法就很明显了。解法一：对每个house位置，用二分法找到最近的heater位置，最后取位置的最大值即为解，因为用了二分法，所以heater数组需要先进行排序。解法二：把house和heater两个数组都进行排序，然后遍历house，每次记住最近的heater位置，下次遍历时从记住的位置开始，最后取位置最大值为解。
-三、代码 解法一： heaters.sort() res = 0 for house in houses: start = 0 end = len(heaters) - 1 while start &#43; 1 &amp;lt; end: mid = start &#43; (end - start) / 2 if heaters[mid] &gt; house: end = mid else: start = mid res = max(res, min(abs(house - heaters[start]), abs(heaters[end] - house))) return res  解法二： houses.sort() heaters.sort() i, res = 0, 0 for house in houses: while i &amp;lt; len(heaters) - 1 and heaters[i] &#43; heaters[i &#43; 1] &amp;lt;= house * 2: i &#43;= 1 res = max(res, abs(heaters[i] - house)) return res  " />
+三、代码 解法一： heaters.sort() res = 0 for house in houses: start = 0 end = len(heaters) - 1 while start &#43; 1 &amp;lt; end: mid = start &#43; (end - start) / 2 if heaters[mid] &gt; house: end = mid else: start = mid res = max(res, min(abs(house - heaters[start]), abs(heaters[end] - house))) return res 解法二： houses.sort() heaters.sort() i, res = 0, 0 for house in houses: while i &amp;lt; len(heaters) - 1 and heaters[i] &#43; heaters[i &#43; 1] &amp;lt;= house * 2: i &#43;= 1 res = max(res, abs(heaters[i] - house)) return res " />
 
   <link rel="stylesheet" href="https://unpkg.com/flexboxgrid@6.3.1/dist/flexboxgrid.min.css" />
   <link rel="stylesheet"
@@ -100,49 +100,36 @@
         </header>
 
         <div class="post-content markdown-body">
-          
-
-<h2 id="一-题目描述">一、题目描述</h2>
-
+          <h2 id="一题目描述">一、题目描述</h2>
 <p><a href="https://leetcode.com/problems/heaters/description/">链接</a></p>
-
-<h2 id="二-题目分析">二、题目分析</h2>
-
+<h2 id="二题目分析">二、题目分析</h2>
 <p>有两个数组，一个数组代表house位置，另一个代表heater位置。这种类型题一般来说都是<strong>固定一个数组，遍历另一个数组</strong>。固定house，遍历heater明显不对。因为heater的相互位置没有考虑，结果一定偏大。以下图为例，两个数组分别为：[0, 3], [1, 2]，如果分别遍历1和2，则结果至少是2，实际应该是1.所以应该固定heater，遍历house。</p>
-
 <p>思路确定之后，解法就很明显了。解法一：对每个house位置，用二分法找到最近的heater位置，最后取位置的最大值即为解，因为用了二分法，所以heater数组需要先进行排序。解法二：把house和heater两个数组都进行排序，然后遍历house，每次记住最近的heater位置，下次遍历时从记住的位置开始，最后取位置最大值为解。</p>
-
-<h2 id="三-代码">三、代码</h2>
-
+<h2 id="三代码">三、代码</h2>
 <h3 id="解法一">解法一：</h3>
-
-<pre><code class="language-python">heaters.sort()
-res = 0
-for house in houses:
-    start = 0
-    end = len(heaters) - 1
-    while start + 1 &amp;lt; end:
-        mid = start + (end - start) / 2
-        if heaters[mid] &gt; house:
-            end = mid
-        else:
-            start = mid
-    res = max(res, min(abs(house - heaters[start]), abs(heaters[end] - house)))
-return res
-</code></pre>
-
-<h3 id="解法二">解法二：</h3>
-
-<pre><code class="language-python">houses.sort()
-heaters.sort()
-i, res = 0, 0
-for house in houses:
-    while i &amp;lt; len(heaters) - 1 and heaters[i] + heaters[i + 1] &amp;lt;= house * 2:
-        i += 1
-    res = max(res, abs(heaters[i] - house))
-return res
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">heaters<span style="color:#f92672">.</span>sort()
+res <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+<span style="color:#66d9ef">for</span> house <span style="color:#f92672">in</span> houses:
+    start <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+    end <span style="color:#f92672">=</span> len(heaters) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
+    <span style="color:#66d9ef">while</span> start <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;</span>lt; end:
+        mid <span style="color:#f92672">=</span> start <span style="color:#f92672">+</span> (end <span style="color:#f92672">-</span> start) <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>
+        <span style="color:#66d9ef">if</span> heaters[mid] <span style="color:#f92672">&gt;</span> house:
+            end <span style="color:#f92672">=</span> mid
+        <span style="color:#66d9ef">else</span>:
+            start <span style="color:#f92672">=</span> mid
+    res <span style="color:#f92672">=</span> max(res, min(abs(house <span style="color:#f92672">-</span> heaters[start]), abs(heaters[end] <span style="color:#f92672">-</span> house)))
+<span style="color:#66d9ef">return</span> res
+</code></pre></div><h3 id="解法二">解法二：</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">houses<span style="color:#f92672">.</span>sort()
+heaters<span style="color:#f92672">.</span>sort()
+i, res <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>
+<span style="color:#66d9ef">for</span> house <span style="color:#f92672">in</span> houses:
+    <span style="color:#66d9ef">while</span> i <span style="color:#f92672">&amp;</span>lt; len(heaters) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">and</span> heaters[i] <span style="color:#f92672">+</span> heaters[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">&amp;</span>lt;<span style="color:#f92672">=</span> house <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>:
+        i <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+    res <span style="color:#f92672">=</span> max(res, abs(heaters[i] <span style="color:#f92672">-</span> house))
+<span style="color:#66d9ef">return</span> res
+</code></pre></div>
         </div>
         
 
@@ -179,6 +166,10 @@ return res
         
 
         <div class="site-footer">
+  
+  <div class="site-footer-item">
+    <a href="http://beian.miit.gov.cn" target="_blank">粤ICP备18020202号-1</a>
+  </div>
   
   <div class="site-footer-item">
     <a href="https://github.com/flyingpot" target="_blank">Github</a>

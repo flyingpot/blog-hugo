@@ -1,15 +1,30 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
     <loc>https://fanjingbo.com/</loc>
-    <lastmod>2019-04-05T11:00:00+08:00</lastmod>
+    <lastmod>2020-08-26T16:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://fanjingbo.com/post/</loc>
-    <lastmod>2019-04-05T11:00:00+08:00</lastmod>
+    <lastmod>2020-08-26T16:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://fanjingbo.com/bloomfilter/</loc>
+    <lastmod>2020-08-26T16:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://fanjingbo.com/linknode/</loc>
+    <lastmod>2020-08-17T16:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://fanjingbo.com/ctf2/</loc>
+    <lastmod>2020-08-15T16:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -54,7 +69,7 @@
   
   <url>
     <loc>https://fanjingbo.com/post/boyer_moore_majority_vote/</loc>
-    <lastmod>2017-11-24T12:35:46+08:00</lastmod>
+    <lastmod>2017-11-24T04:35:46+00:00</lastmod>
   </url>
   
   <url>

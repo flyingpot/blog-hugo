@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Hugo 0.58.3" />
+  <meta name="generator" content="Hugo 0.74.3" />
 
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,7 +19,7 @@
       "articleSection" : "post",
       "name" : "Python中list增加元素的几种方法",
       "headline" : "Python中list增加元素的几种方法",
-      "description" : "一 我一般会用append方法来把元素增加到list中.但今天我看到一种新方法：\na = [1] a \x2b= 2, # a = [1, 2]  感觉挺神奇的，所以我查了一些资料，总结如下.\n二 1.元组 上面的2,代表了单元素元组(one element tuple).在元组的表达式中，逗号是必需的，括号则可要可不要.对于单元素元组来说，后面的逗号必须有；而对于多元素元组，只要中间有逗号即可.\n1, 1,2,3  2.a\x2b=b和a=a\x2bb的区别 a\x2b=b\n\x26gt;\x26gt;\x26gt; a = [1] \x26gt;\x26gt;\x26gt; b = a \x26gt;\x26gt;\x26gt; b \x2b= [2] \x26gt;\x26gt;\x26gt; a [1, 2] \x26gt;\x26gt;\x26gt; b [1, 2]  a=a\x2bb\n\x26gt;\x26gt;\x26gt; b = a \x26gt;\x26gt;\x26gt; b = b \x2b [2] \x26gt;\x26gt;\x26gt; a [1] \x26gt;\x26gt;\x26gt; b [1, 2]  对于可变对象，\x2b=操作调用iadd方法，直接在原对象a上进行更新，该方法的返回值是None；\x2b操作调用add方法，返回一个新的对象，原对象不修改，所以b被重新赋值，b指向了一个新的对象.\n对于不可变对象，只有add方法，所以两者效果一样.\n不仅如此，在list增加元素方面，两者也有不同.\n\x26gt;\x26gt;\x26gt; a = [] \x26gt;\x26gt;\x26gt; a = a \x2b 1 Traceback (most recent call last): File \x26quot;\x26amp;lt;stdin\x26gt;\x26quot;, line 1, in \x26amp;lt;module\x26gt; TypeError: can only concatenate list (not \x26quot;int\x26quot;) to list \x26gt;\x26gt;\x26gt; a = a \x2b (1,) Traceback (most recent call last): File \x26quot;\x26amp;lt;stdin\x26gt;\x26quot;, line 1, in \x26amp;lt;module\x26gt; TypeError: can only concatenate list (not \x26quot;tuple\x26quot;) to list \x26gt;\x26gt;\x26gt; a = a \x2b [1] \x26gt;\x26gt;\x26gt; a [1]  \x26gt;\x26gt;\x26gt; a \x2b= 1, \x26gt;\x26gt;\x26gt; a \x2b= [1] \x26gt;\x26gt;\x26gt; a \x2b= 1 Traceback (most recent call last): File \x26quot;\x26amp;lt;stdin\x26gt;\x26quot;, line 1, in \x26amp;lt;module\x26gt; TypeError: \x27int\x27 object is not iterable  可以看出对于a\x2b=b，b只要是iterable即可；而对于a=a\x2bb，b必须是list类型.",
+      "description" : "一 我一般会用append方法来把元素增加到list中.但今天我看到一种新方法：\na = [1] a \u002b= 2, # a = [1, 2] 感觉挺神奇的，所以我查了一些资料，总结如下.\n二 1.元组 上面的2,代表了单元素元组(one element tuple).在元组的表达式中，逗号是必需的，括号则可要可不要.对于单元素元组来说，后面的逗号必须有；而对于多元素元组，只要中间有逗号即可.\n1, 1,2,3 2.a\u002b=b和a=a\u002bb的区别 a\u002b=b\n\u0026gt;\u0026gt;\u0026gt; a = [1] \u0026gt;\u0026gt;\u0026gt; b = a \u0026gt;\u0026gt;\u0026gt; b \u002b= [2] \u0026gt;\u0026gt;\u0026gt; a [1, 2] \u0026gt;\u0026gt;\u0026gt; b [1, 2] a=a\u002bb\n\u0022 data-lang=\u0022python\u0022\u0026gt;\u0026gt;\u0026gt; b = a \u0026gt;\u0026gt;\u0026gt; b = b \u002b [2] \u0026gt;\u0026gt;\u0026gt; a [1] \u0026gt;\u0026gt;\u0026gt; b [1, 2] 对于可变对象，\u002b=操作调用iadd方法，直接在原对象a上进行更新，该方法的返回值是None；\u002b操作调用add方法，返回一个新的对象，原对象不修改，所以b被重新赋值，b指向了一个新的对象.\n对于不可变对象，只有add方法，所以两者效果一样.\n不仅如此，在list增加元素方面，两者也有不同.\n\u0026gt;\u0026gt;\u0026gt; a = [] \u0026gt;\u0026gt;\u0026gt; a = a \u002b 1 Traceback (most recent call last): File \u0026#34;\u0026amp;lt;stdin\u0026gt;\u0026#34;, line 1, in \u0026amp;lt;module\u0026gt; TypeError: can only concatenate list (not \u0026#34;int\u0026#34;) to list \u0026gt;\u0026gt;\u0026gt; a = a \u002b (1,) Traceback (most recent call last): File \u0026#34;\u0026amp;lt;stdin\u0026gt;\u0026#34;, line 1, in \u0026amp;lt;module\u0026gt; TypeError: can only concatenate list (not \u0026#34;tuple\u0026#34;) to list \u0026gt;\u0026gt;\u0026gt; a = a \u002b [1] \u0026gt;\u0026gt;\u0026gt; a [1] \u0022",
       "inLanguage" : "en-US",
       "author" : "Fanjingbo",
       "creator" : "Fanjingbo",
@@ -27,8 +27,8 @@
       "accountablePerson" : "Fanjingbo",
       "copyrightHolder" : "Fanjingbo",
       "copyrightYear" : "2017",
-      "datePublished": "2017-11-30 07:51:59 \x2b0800 CST",
-      "dateModified" : "2017-11-30 07:51:59 \x2b0800 CST",
+      "datePublished": "2017-11-30 07:51:59 \u002b0800 CST",
+      "dateModified" : "2017-11-30 07:51:59 \u002b0800 CST",
       "url" : "https:\/\/fanjingbo.com\/post\/python_add_elements_in_list\/",
       "keywords" : [  ]
   }
@@ -37,14 +37,14 @@
   <meta property="og:title" content="Python中list增加元素的几种方法 - Fan Jingbo&#39;s Blog" />
   <meta property="og:type" content="article" />
   <meta name="description" content="一 我一般会用append方法来把元素增加到list中.但今天我看到一种新方法：
-a = [1] a &#43;= 2, # a = [1, 2]  感觉挺神奇的，所以我查了一些资料，总结如下.
+a = [1] a &#43;= 2, # a = [1, 2] 感觉挺神奇的，所以我查了一些资料，总结如下.
 二 1.元组 上面的2,代表了单元素元组(one element tuple).在元组的表达式中，逗号是必需的，括号则可要可不要.对于单元素元组来说，后面的逗号必须有；而对于多元素元组，只要中间有逗号即可.
-1, 1,2,3  2.a&#43;=b和a=a&#43;b的区别 a&#43;=b
-&gt;&gt;&gt; a = [1] &gt;&gt;&gt; b = a &gt;&gt;&gt; b &#43;= [2] &gt;&gt;&gt; a [1, 2] &gt;&gt;&gt; b [1, 2]  a=a&#43;b
-&gt;&gt;&gt; b = a &gt;&gt;&gt; b = b &#43; [2] &gt;&gt;&gt; a [1] &gt;&gt;&gt; b [1, 2]  对于可变对象，&#43;=操作调用iadd方法，直接在原对象a上进行更新，该方法的返回值是None；&#43;操作调用add方法，返回一个新的对象，原对象不修改，所以b被重新赋值，b指向了一个新的对象.
+1, 1,2,3 2.a&#43;=b和a=a&#43;b的区别 a&#43;=b
+&gt;&gt;&gt; a = [1] &gt;&gt;&gt; b = a &gt;&gt;&gt; b &#43;= [2] &gt;&gt;&gt; a [1, 2] &gt;&gt;&gt; b [1, 2] a=a&#43;b
+&#34; data-lang=&#34;python&#34;&gt;&gt;&gt; b = a &gt;&gt;&gt; b = b &#43; [2] &gt;&gt;&gt; a [1] &gt;&gt;&gt; b [1, 2] 对于可变对象，&#43;=操作调用iadd方法，直接在原对象a上进行更新，该方法的返回值是None；&#43;操作调用add方法，返回一个新的对象，原对象不修改，所以b被重新赋值，b指向了一个新的对象.
 对于不可变对象，只有add方法，所以两者效果一样.
 不仅如此，在list增加元素方面，两者也有不同.
-&gt;&gt;&gt; a = [] &gt;&gt;&gt; a = a &#43; 1 Traceback (most recent call last): File &quot;&amp;lt;stdin&gt;&quot;, line 1, in &amp;lt;module&gt; TypeError: can only concatenate list (not &quot;int&quot;) to list &gt;&gt;&gt; a = a &#43; (1,) Traceback (most recent call last): File &quot;&amp;lt;stdin&gt;&quot;, line 1, in &amp;lt;module&gt; TypeError: can only concatenate list (not &quot;tuple&quot;) to list &gt;&gt;&gt; a = a &#43; [1] &gt;&gt;&gt; a [1]  &gt;&gt;&gt; a &#43;= 1, &gt;&gt;&gt; a &#43;= [1] &gt;&gt;&gt; a &#43;= 1 Traceback (most recent call last): File &quot;&amp;lt;stdin&gt;&quot;, line 1, in &amp;lt;module&gt; TypeError: &#39;int&#39; object is not iterable  可以看出对于a&#43;=b，b只要是iterable即可；而对于a=a&#43;b，b必须是list类型." />
+&gt;&gt;&gt; a = [] &gt;&gt;&gt; a = a &#43; 1 Traceback (most recent call last): File &#34;&amp;lt;stdin&gt;&#34;, line 1, in &amp;lt;module&gt; TypeError: can only concatenate list (not &#34;int&#34;) to list &gt;&gt;&gt; a = a &#43; (1,) Traceback (most recent call last): File &#34;&amp;lt;stdin&gt;&#34;, line 1, in &amp;lt;module&gt; TypeError: can only concatenate list (not &#34;tuple&#34;) to list &gt;&gt;&gt; a = a &#43; [1] &gt;&gt;&gt; a [1] &#34;" />
 
   <link rel="stylesheet" href="https://unpkg.com/flexboxgrid@6.3.1/dist/flexboxgrid.min.css" />
   <link rel="stylesheet"
@@ -105,109 +105,74 @@ a = [1] a &#43;= 2, # a = [1, 2]  感觉挺神奇的，所以我查了一些资�
         </header>
 
         <div class="post-content markdown-body">
-          
-
-<h2 id="一">一</h2>
-
+          <h2 id="一">一</h2>
 <p>我一般会用append方法来把元素增加到list中.但今天我看到一种新方法：</p>
-
-<pre><code class="language-python">a = [1]
-a += 2,
-# a = [1, 2]
-</code></pre>
-
-<p>感觉挺神奇的，所以我查了一些资料，总结如下.</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">a <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>]
+a <span style="color:#f92672">+=</span> <span style="color:#ae81ff">2</span>,
+<span style="color:#75715e"># a = [1, 2]</span>
+</code></pre></div><p>感觉挺神奇的，所以我查了一些资料，总结如下.</p>
 <h2 id="二">二</h2>
-
-<h3 id="1-元组">1.元组</h3>
-
+<h3 id="1元组">1.元组</h3>
 <p>上面的2,代表了单元素元组(one element tuple).在元组的表达式中，逗号是必需的，括号则可要可不要.对于单元素元组来说，后面的逗号必须有；而对于多元素元组，只要中间有逗号即可.</p>
-
-<pre><code class="language-python">1,
-1,2,3
-</code></pre>
-
-<h3 id="2-a-b和a-a-b的区别">2.a+=b和a=a+b的区别</h3>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#ae81ff">1</span>,
+<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>
+</code></pre></div><h3 id="2ab和aab的区别">2.a+=b和a=a+b的区别</h3>
 <p>a+=b</p>
-
-<pre><code class="language-python">&gt;&gt;&gt; a = [1]
-&gt;&gt;&gt; b = a
-&gt;&gt;&gt; b += [2]
-&gt;&gt;&gt; a
-[1, 2]
-&gt;&gt;&gt; b
-[1, 2]
-</code></pre>
-
-<p>a=a+b</p>
-
-<pre><code class="language-python&gt;&gt;&gt;">&gt;&gt;&gt; b = a
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> a <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>]
+<span style="color:#f92672">&gt;&gt;&gt;</span> b <span style="color:#f92672">=</span> a
+<span style="color:#f92672">&gt;&gt;&gt;</span> b <span style="color:#f92672">+=</span> [<span style="color:#ae81ff">2</span>]
+<span style="color:#f92672">&gt;&gt;&gt;</span> a
+[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>]
+<span style="color:#f92672">&gt;&gt;&gt;</span> b
+[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>]
+</code></pre></div><p>a=a+b</p>
+<pre><code class="language-python>>>" data-lang="python>>>">&gt;&gt;&gt; b = a
 &gt;&gt;&gt; b = b + [2]
 &gt;&gt;&gt; a
 [1]
 &gt;&gt;&gt; b
 [1, 2]
-</code></pre>
-
-<p>对于可变对象，+=操作调用<strong>iadd</strong>方法，直接在原对象a上进行更新，该方法的返回值是None；+操作调用<strong>add</strong>方法，返回一个新的对象，原对象不修改，所以b被重新赋值，b指向了一个新的对象.</p>
-
+</code></pre><p>对于可变对象，+=操作调用<strong>iadd</strong>方法，直接在原对象a上进行更新，该方法的返回值是None；+操作调用<strong>add</strong>方法，返回一个新的对象，原对象不修改，所以b被重新赋值，b指向了一个新的对象.</p>
 <p>对于不可变对象，只有<strong>add</strong>方法，所以两者效果一样.</p>
-
 <p>不仅如此，在list增加元素方面，两者也有不同.</p>
-
-<pre><code class="language-python">&gt;&gt;&gt; a = []
-&gt;&gt;&gt; a = a + 1
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> a <span style="color:#f92672">=</span> []
+<span style="color:#f92672">&gt;&gt;&gt;</span> a <span style="color:#f92672">=</span> a <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
 Traceback (most recent call last):
-  File &quot;&amp;lt;stdin&gt;&quot;, line 1, in &amp;lt;module&gt;
-TypeError: can only concatenate list (not &quot;int&quot;) to list
-&gt;&gt;&gt; a = a + (1,)
+  File <span style="color:#e6db74">&#34;&amp;lt;stdin&gt;&#34;</span>, line <span style="color:#ae81ff">1</span>, <span style="color:#f92672">in</span> <span style="color:#f92672">&amp;</span>lt;module<span style="color:#f92672">&gt;</span>
+<span style="color:#a6e22e">TypeError</span>: can only concatenate list (<span style="color:#f92672">not</span> <span style="color:#e6db74">&#34;int&#34;</span>) to list
+<span style="color:#f92672">&gt;&gt;&gt;</span> a <span style="color:#f92672">=</span> a <span style="color:#f92672">+</span> (<span style="color:#ae81ff">1</span>,)
 Traceback (most recent call last):
-  File &quot;&amp;lt;stdin&gt;&quot;, line 1, in &amp;lt;module&gt;
-TypeError: can only concatenate list (not &quot;tuple&quot;) to list
-&gt;&gt;&gt; a = a + [1]
-&gt;&gt;&gt; a
-[1]
-</code></pre>
-
-<pre><code class="language-python&gt;&gt;&gt;">&gt;&gt;&gt; a += 1,
+  File <span style="color:#e6db74">&#34;&amp;lt;stdin&gt;&#34;</span>, line <span style="color:#ae81ff">1</span>, <span style="color:#f92672">in</span> <span style="color:#f92672">&amp;</span>lt;module<span style="color:#f92672">&gt;</span>
+<span style="color:#a6e22e">TypeError</span>: can only concatenate list (<span style="color:#f92672">not</span> <span style="color:#e6db74">&#34;tuple&#34;</span>) to list
+<span style="color:#f92672">&gt;&gt;&gt;</span> a <span style="color:#f92672">=</span> a <span style="color:#f92672">+</span> [<span style="color:#ae81ff">1</span>]
+<span style="color:#f92672">&gt;&gt;&gt;</span> a
+[<span style="color:#ae81ff">1</span>]
+</code></pre></div><pre><code class="language-python>>>" data-lang="python>>>">&gt;&gt;&gt; a += 1,
 &gt;&gt;&gt; a += [1]
 &gt;&gt;&gt; a += 1
 Traceback (most recent call last):
   File &quot;&amp;lt;stdin&gt;&quot;, line 1, in &amp;lt;module&gt;
 TypeError: 'int' object is not iterable
-</code></pre>
-
-<p>可以看出对于a+=b，b只要是iterable即可；而对于a=a+b，b必须是list类型.其中的原因，可能是<strong>iadd</strong>和<strong>add</strong>方法实现有差异，这里就不做深究了.</p>
-
-<h3 id="3-list增加元素几种方法的速度对比">3.list增加元素几种方法的速度对比</h3>
-
+</code></pre><p>可以看出对于a+=b，b只要是iterable即可；而对于a=a+b，b必须是list类型.其中的原因，可能是<strong>iadd</strong>和<strong>add</strong>方法实现有差异，这里就不做深究了.</p>
+<h3 id="3list增加元素几种方法的速度对比">3.list增加元素几种方法的速度对比</h3>
 <p>原本我在一个Python文件里写几种方法的实现函数，然后调用timeit模块逐个运行，但是发现无论顺序如何，第一个方法总是时间偏长，不知道原因在哪.所以为了避免这种误差，使用python -m timeit &lsquo;(CODE)&lsquo;分别运行，结果如下</p>
-
-<pre><code class="language-python">&gt;&gt;&gt; python -m timeit 'a=[];a.insert(0,[1])'
-1000000 loops, best of 3: 0.354 usec per loop
-&gt;&gt;&gt; python -m timeit 'a=[];a.extend([1])'
-1000000 loops, best of 3: 0.228 usec per loop
-&gt;&gt;&gt; python -m timeit 'a=[];a.append(1)'
-10000000 loops, best of 3: 0.153 usec per loop
-&gt;&gt;&gt; python -m timeit 'a=[];a+=[1]'
-10000000 loops, best of 3: 0.149 usec per loop
-&gt;&gt;&gt; python -m timeit 'a=[];a+=1,'
-10000000 loops, best of 3: 0.101 usec per loop
-</code></pre>
-
-<p>insert和extend这两种方法不是专门为list增加元素设计的，所以用时较长.append方法和加list时间相近，但是append只适用于一个一个元素的增加，而加list可以一次增加多个元素.加tuple是其中最快的.</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> python <span style="color:#f92672">-</span>m timeit <span style="color:#e6db74">&#39;a=[];a.insert(0,[1])&#39;</span>
+<span style="color:#ae81ff">1000000</span> loops, best of <span style="color:#ae81ff">3</span>: <span style="color:#ae81ff">0.354</span> usec per loop
+<span style="color:#f92672">&gt;&gt;&gt;</span> python <span style="color:#f92672">-</span>m timeit <span style="color:#e6db74">&#39;a=[];a.extend([1])&#39;</span>
+<span style="color:#ae81ff">1000000</span> loops, best of <span style="color:#ae81ff">3</span>: <span style="color:#ae81ff">0.228</span> usec per loop
+<span style="color:#f92672">&gt;&gt;&gt;</span> python <span style="color:#f92672">-</span>m timeit <span style="color:#e6db74">&#39;a=[];a.append(1)&#39;</span>
+<span style="color:#ae81ff">10000000</span> loops, best of <span style="color:#ae81ff">3</span>: <span style="color:#ae81ff">0.153</span> usec per loop
+<span style="color:#f92672">&gt;&gt;&gt;</span> python <span style="color:#f92672">-</span>m timeit <span style="color:#e6db74">&#39;a=[];a+=[1]&#39;</span>
+<span style="color:#ae81ff">10000000</span> loops, best of <span style="color:#ae81ff">3</span>: <span style="color:#ae81ff">0.149</span> usec per loop
+<span style="color:#f92672">&gt;&gt;&gt;</span> python <span style="color:#f92672">-</span>m timeit <span style="color:#e6db74">&#39;a=[];a+=1,&#39;</span>
+<span style="color:#ae81ff">10000000</span> loops, best of <span style="color:#ae81ff">3</span>: <span style="color:#ae81ff">0.101</span> usec per loop
+</code></pre></div><p>insert和extend这两种方法不是专门为list增加元素设计的，所以用时较长.append方法和加list时间相近，但是append只适用于一个一个元素的增加，而加list可以一次增加多个元素.加tuple是其中最快的.</p>
 <p>考虑加list和加tuple两种方法的时间差异可能存在于list和tuple的定义中，所以进一步实验如下：</p>
-
-<pre><code class="language-python">&gt;&gt;&gt; python -m timeit 'a=[1]'
-10000000 loops, best of 3: 0.069 usec per loop
-&gt;&gt;&gt; python -m timeit 'a=1,'
-10000000 loops, best of 3: 0.0214 usec per loop
-</code></pre>
-
-<p>果然不出所料，tuple定义比list快，直接导致了加tuple比加list快.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> python <span style="color:#f92672">-</span>m timeit <span style="color:#e6db74">&#39;a=[1]&#39;</span>
+<span style="color:#ae81ff">10000000</span> loops, best of <span style="color:#ae81ff">3</span>: <span style="color:#ae81ff">0.069</span> usec per loop
+<span style="color:#f92672">&gt;&gt;&gt;</span> python <span style="color:#f92672">-</span>m timeit <span style="color:#e6db74">&#39;a=1,&#39;</span>
+<span style="color:#ae81ff">10000000</span> loops, best of <span style="color:#ae81ff">3</span>: <span style="color:#ae81ff">0.0214</span> usec per loop
+</code></pre></div><p>果然不出所料，tuple定义比list快，直接导致了加tuple比加list快.</p>
 
         </div>
         
@@ -245,6 +210,10 @@ TypeError: 'int' object is not iterable
         
 
         <div class="site-footer">
+  
+  <div class="site-footer-item">
+    <a href="http://beian.miit.gov.cn" target="_blank">粤ICP备18020202号-1</a>
+  </div>
   
   <div class="site-footer-item">
     <a href="https://github.com/flyingpot" target="_blank">Github</a>

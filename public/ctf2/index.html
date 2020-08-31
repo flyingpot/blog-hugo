@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.74.3" />
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Fanjingbo" />
+  <meta property="og:url" content="https://fanjingbo.com/ctf2/" />
+  <link rel="canonical" href="https://fanjingbo.com/ctf2/" /><script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/fanjingbo.com"
+      },
+      "articleSection" : "post",
+      "name" : "CTF从零单排（二）—— bof (pwnable.kr)",
+      "headline" : "CTF从零单排（二）—— bof (pwnable.kr)",
+      "description" : "一、题目分析 查看题目给出的信息，一个C代码文件和一个可执行文件，C代码文件如下：\n#include \u0026lt;stdio.h\u0026gt; #include \u0026lt;string.h\u0026gt; #include \u0026lt;stdlib.h\u0026gt; void func(int key){ char overflowme[32]; printf(\u0026quot;overflow me : \u0026quot;); gets(overflowme);\t\/\/ smash me! if(key == 0xcafebabe){ system(\u0026quot;\/bin\/sh\u0026quot;); } else{ printf(\u0026quot;Nah..\\n\u0026quot;); } } int main(int argc, char* argv[]){ func(0xdeadbeef); return 0; }  可以看出这道题考的是栈溢出，从标准输入读取的数据覆盖掉func传入的参数值即可提权。关键问题就是如何构造这个数据。\n二、题解 使用gdb对可执行文件bof进行分析：\n首先使用start开始执行，方便之后使用地址打断点\n然后使用disas func查看func函数的汇编代码\n找到get函数调用后的比较语句并打断点\n使用c（continue）继续执行代码\n输入AAAAAA，使用x \/40xw $esp查看栈数据。A用16进制表示是41，可以看到第一个A到deadbeef相差52个字节。因此我们只需要构造52个A加上cafebabe即可。\n使用Python的pwn库：\n成功拿到flag\n由此可见，C代码中使用gets有多危险，使用gcc编译时也会提示gets的危险性。\n三、遗留问题 虽然题目参考着其他人的题解做了出来，但是目前还是有两个问题我还没想明白，在这里记录一下：\n  发现如果使用gcc默认编译选项编译出来的可执行文件（可能与64位有关），deadbeef参数在低地址，标准输入参数在高地址，不符合栈帧是从高地址向低地址生长（申请）的原则，很奇怪\n  为什么0xdeadbeef写入栈中的时候没有按照小端原则？\n问题已解决，因为0xdeadbeef是int类型，占据了4个字节，所以无所谓大端小端，在内存中就是以0xdeadbeef形式保存的\n  ",
+      "inLanguage" : "en-US",
+      "author" : "Fanjingbo",
+      "creator" : "Fanjingbo",
+      "publisher": "Fanjingbo",
+      "accountablePerson" : "Fanjingbo",
+      "copyrightHolder" : "Fanjingbo",
+      "copyrightYear" : "2020",
+      "datePublished": "2020-08-15 16:00:00 \u002b0000 UTC",
+      "dateModified" : "2020-08-15 16:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/fanjingbo.com\/ctf2\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>CTF从零单排（二）—— bof (pwnable.kr) - Fan Jingbo&#39;s Blog</title>
+  <meta property="og:title" content="CTF从零单排（二）—— bof (pwnable.kr) - Fan Jingbo&#39;s Blog" />
+  <meta property="og:type" content="article" />
+  <meta name="description" content="一、题目分析 查看题目给出的信息，一个C代码文件和一个可执行文件，C代码文件如下：
+#include &lt;stdio.h&gt; #include &lt;string.h&gt; #include &lt;stdlib.h&gt; void func(int key){ char overflowme[32]; printf(&quot;overflow me : &quot;); gets(overflowme);	// smash me! if(key == 0xcafebabe){ system(&quot;/bin/sh&quot;); } else{ printf(&quot;Nah..\n&quot;); } } int main(int argc, char* argv[]){ func(0xdeadbeef); return 0; }  可以看出这道题考的是栈溢出，从标准输入读取的数据覆盖掉func传入的参数值即可提权。关键问题就是如何构造这个数据。
+二、题解 使用gdb对可执行文件bof进行分析：
+首先使用start开始执行，方便之后使用地址打断点
+然后使用disas func查看func函数的汇编代码
+找到get函数调用后的比较语句并打断点
+使用c（continue）继续执行代码
+输入AAAAAA，使用x /40xw $esp查看栈数据。A用16进制表示是41，可以看到第一个A到deadbeef相差52个字节。因此我们只需要构造52个A加上cafebabe即可。
+使用Python的pwn库：
+成功拿到flag
+由此可见，C代码中使用gets有多危险，使用gcc编译时也会提示gets的危险性。
+三、遗留问题 虽然题目参考着其他人的题解做了出来，但是目前还是有两个问题我还没想明白，在这里记录一下：
+  发现如果使用gcc默认编译选项编译出来的可执行文件（可能与64位有关），deadbeef参数在低地址，标准输入参数在高地址，不符合栈帧是从高地址向低地址生长（申请）的原则，很奇怪
+  为什么0xdeadbeef写入栈中的时候没有按照小端原则？
+问题已解决，因为0xdeadbeef是int类型，占据了4个字节，所以无所谓大端小端，在内存中就是以0xdeadbeef形式保存的
+  " />
+
+  <link rel="stylesheet" href="https://unpkg.com/flexboxgrid@6.3.1/dist/flexboxgrid.min.css" />
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/tomorrow.min.css" />
+  <link rel="stylesheet" href="/css/index.css">
+  <link href="/index.xml" rel="alternate" type="application/rss+xml" title="Fan Jingbo&#39;s Blog">
+  
+  <link href="https://fonts.googleapis.com/css?family=Arvo|Permanent+Marker" rel="stylesheet">
+  
+  <script>
+    
+
+    (function (undefined) { }).call('object' === typeof window && window || 'object' === typeof self && self || 'object' === typeof global && global || {});
+  </script>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132076423-1"></script><script src="https://fanjingbo.com/analytics.js"></script>
+</head>
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2 col-lg-6 col-lg-offset-3">
+        <div class="site-header">
+          
+<header>
+  <div class="signatures site-title">
+    <a href="/">Fanjingbo</a>
+  </div>
+</header>
+<div class="row end-xs">
+  
+  
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">CTF从零单排（二）—— bof (pwnable.kr)</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2020-08-15 16:00:00 UTC">
+                15 Aug 2020
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://fanjingbo.com">@Fanjingbo</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          <h1 id="一题目分析">一、题目分析</h1>
+<p>查看题目给出的信息，一个C代码文件和一个可执行文件，C代码文件如下：</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+void func(int key){
+    char overflowme[32];
+    printf(&quot;overflow me : &quot;);
+    gets(overflowme);	// smash me!
+    if(key == 0xcafebabe){
+        system(&quot;/bin/sh&quot;);
+    }
+    else{
+        printf(&quot;Nah..\n&quot;);
+    }
+}
+int main(int argc, char* argv[]){
+    func(0xdeadbeef);
+    return 0;
+}
+</code></pre>
+<p>可以看出这道题考的是栈溢出，从标准输入读取的数据覆盖掉func传入的参数值即可提权。关键问题就是如何构造这个数据。</p>
+<h2 id="二题解">二、题解</h2>
+<p>使用gdb对可执行文件bof进行分析：</p>
+<p>首先使用start开始执行，方便之后使用地址打断点</p>
+<p>然后使用disas func查看func函数的汇编代码</p>
+<p>找到get函数调用后的比较语句并打断点</p>
+<p>使用c（continue）继续执行代码</p>
+<p>输入AAAAAA，使用x /40xw $esp查看栈数据。A用16进制表示是41，可以看到第一个A到deadbeef相差52个字节。因此我们只需要构造52个A加上cafebabe即可。</p>
+<p>使用Python的pwn库：</p>
+<p>成功拿到flag</p>
+<p>由此可见，C代码中使用gets有多危险，使用gcc编译时也会提示gets的危险性。</p>
+<h2 id="三遗留问题">三、遗留问题</h2>
+<p>虽然题目参考着其他人的题解做了出来，但是目前还是有两个问题我还没想明白，在这里记录一下：</p>
+<ol>
+<li>
+<p>发现如果使用gcc默认编译选项编译出来的可执行文件（可能与64位有关），deadbeef参数在低地址，标准输入参数在高地址，不符合栈帧是从高地址向低地址生长（申请）的原则，很奇怪</p>
+</li>
+<li>
+<p>为什么0xdeadbeef写入栈中的时候没有按照小端原则？</p>
+<p>问题已解决，因为0xdeadbeef是int类型，占据了4个字节，所以无所谓大端小端，在内存中就是以0xdeadbeef形式保存的</p>
+</li>
+</ol>
+
+        </div>
+        
+
+        
+
+
+        
+        
+        <div style="height: 50px;"></div>
+        
+        <div class="post-comments">
+          <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://fanjingbo-com.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+        </div>
+        
+        
+
+        <div class="site-footer">
+  
+  <div class="site-footer-item">
+    <a href="http://beian.miit.gov.cn" target="_blank">粤ICP备18020202号-1</a>
+  </div>
+  
+  <div class="site-footer-item">
+    <a href="https://github.com/flyingpot" target="_blank">Github</a>
+  </div>
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  <script src="/js/highlight.pack.js"></script>
+<script src="https://unpkg.com/quicklink@0.1.1/dist/quicklink.umd.js"></script>
+
+<script>
+  hljs.initHighlightingOnLoad();
+  
+  var posts = document.getElementById('posts-list');
+  posts && quicklink({
+    el: posts,
+    priority: true,
+  });
+</script>
+
+  
+
+</body>
+
+</html>
