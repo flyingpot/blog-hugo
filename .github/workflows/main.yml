@@ -26,4 +26,4 @@ jobs:
       run: |
         hugo --minify
         coscmd config -a ${{ secrets.SecretId }} -s ${{ secrets.SecretKey }} -b ${{ secrets.BucketName }} -r ${{ secrets.BucketRegion }} -m 10
-        coscmd upload -r -s --delete public/ /
+        coscmd upload -r -s --delete -f public/ /
