@@ -18,7 +18,7 @@ DefaultContentLanguage = "cn"
 [params]
 avatar = "static/logo.png"
 disqus = "fanjingbo-com" # disqus account name
-extraHead = '<script async src="https://www.googletagmanager.com/gtag/js?id=UA-132076423-1"></script><script src="https://fanjingbo.com/analytics.js"></script>'
+extraHead = '<script async src="https://www.googletagmanager.com/gtag/js?id=UA-132076423-1"></script>'
 [[params.socials]]
 name = "粤ICP备18020202号-1"
 link = "http://beian.miit.gov.cn"
