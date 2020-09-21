@@ -1,7 +1,7 @@
 +++
 date = 2020-08-26T16:00:00Z
 title = "由缓存穿透想到的——HashSet和布隆过滤器"
-url = "bloomfilter"
+url = "/post/bloomfilter"
 
 +++
 ## 一、缓存穿透
