@@ -1,13 +1,12 @@
 +++
 date = 2020-11-07T16:00:00Z
-draft = true
-title = "Java的匿名类、Lambda、匿名接口类与方法引用"
-url = "/post/java"
+title = "Java的匿名类、匿名函数与方法引用"
+url = "/post/java-anonymous-class-lambda-method-reference"
 
 +++
 ### 一、前言
 
-从我接触Java伊始，就接触了很多匿名函数，最典型的是Java的多线程，写法如下：
+从我接触Java伊始，就见过了很多匿名函数，最典型的是Java的多线程，写法如下：
 
             new Thread(() -> {
                 for (int i = 0; i < 100; i++) {
@@ -49,7 +48,7 @@ url = "/post/java"
 
 可以看到，在这个例子中，PetShop这个类的sell方法会用到Pet接口的实现类，但是这个实现类只需要使用一次，不需要复用（因为这里面逻辑是出售）。在这种情况下就可以使用匿名类，在不定义类名的情况下实现两个方法即可。
 
-但是在只需要实现接口一个方法的情况下，我们可以简化上面的使用方式，适用匿名函数，也就是Lambda表达式：
+但是在只需要实现接口一个方法的情况下，我们可以简化上面的使用方式，使用匿名函数，也就是Lambda表达式：
 
     interface Pet {
         String getName();
@@ -65,25 +64,40 @@ url = "/post/java"
         }
     }
 
-一下子少了很多行代码，Lambda表达式分为两部分，用->分开，左边是方法的参数，右边是返回值。相比匿名类的实现方式，删除了接口信息和方法名。其实仔细想想就知道为什么这些东西都能删掉。接口信息在sell方法中有定义，方法调用也有，并且由于只有一种方法需要实现，所以根本不需要纠结，只需要把Lambda右边的返回值赋值给pet.getName()就好了。
+使用了Lambda表达式之后一下子少了很多行代码。Lambda表达式分为两部分，用->分开，左边是方法的参数，右边是返回值。相比匿名类的实现方式，删除了接口信息和方法名。其实仔细想想就知道为什么这些东西都能删掉。接口信息在sell方法中有定义，方法调用也有，并且由于只有一种方法需要实现，所以根本不需要纠结，只需要把Lambda右边的返回值赋值给pet.getName()就好了。
 
-，用Comparator接口举个例子
+再用Comparator接口举个例子：
 
-            class ComparatorImpl implements Comparator<Integer> {
-                @Override
-                public int compare(Integer o1, Integer o2) {
-                    return o1.compareTo(o2);
-                }
-            }
-            List<Integer> integers = new ArrayList<>(Arrays.asList(5, 4, 3, 2, 1, 0));
-            Comparator<Integer> comparator0 = new ComparatorImpl();
-            Comparator<Integer> comparator1 = new Comparator<Integer>() {
-                @Override
-                public int compare(Integer o1, Integer o2) {
-                    return o1.compareTo(o2);
-                }
-            };
-    //        Comparator<Integer> comparator2 = (o1, o2) -> o1 > o2 ? 1 : 0;
-            integers.sort(comparator0);
-            System.out.println(integers);
-    //        integers.sort(comparator2);
+    List<Integer> integers = new ArrayList<>(Arrays.asList(5, 4, 3, 2, 1, 0));
+    Comparator<Integer> comparator1 = new Comparator<Integer>() {
+        @Override
+        public int compare(Integer o1, Integer o2) {
+            return o1.compareTo(o2);
+        }
+    };
+    Comparator<Integer> comparator2 = (o1, o2) -> o1 > o2 ? 1 : 0;
+    integers.sort(comparator1);
+    integers.sort(comparator2);
+
+Comparator中需要实现compare方法，而sort里面需要传入一个Comparator实例，最终实例的compare方法会被调用，来决定排序的规则。可以用匿名类和匿名函数两种方式来实现，这种情况下自然是Lambda表达式更简洁了。但是说实话对于不了解的人来说，Lambda表达式还是有着一定的理解门槛的。
+
+### 三、方法引用
+
+匿名函数Lambda表达式其实仍然不是最简化的调用方法，因为我们可以发现参数有可能也可以省略，这就是所谓的方法引用，还是拿Comparator举例子：
+
+    Comparator<Integer> comparator3 = Integer::compareTo;
+    integers.sort(comparator3);
+
+可以看到，方法引用省去了参数，直接使用类::方法的形式实现匿名函数的效果。这里的方法可以是静态方法，也可以是实例方法（就如同这个例子一样，第一个参数是实例方法的调用者，第二个参数是实例函数的参数），甚至类也可以是一个实例，非常灵活。
+
+对于具体参数如何调用的，可以参考以下三句话：
+
+1. 成员方法的方法签名，前面会追加 this 的类型。
+2. 静态方法的方法签名，因为没有 this, 不会追加任何东西。
+3. 当 :: 前是一个实例时，这个实例会作为第一个参数给绑定到目标方法签名上。
+
+但是对于一些不带参数的方法调用，方法引用也不太好用，比如文章刚开始的多线程例子就没法使用方法引用的方式表达。
+
+### 四、总结
+
+可以看出，匿名类、匿名函数与方法引用三者抽象程度越来越高，适用范围越来越小。经过这一番探究，现在再回头看文章第一部分的多线程代码就十分简单了：start()调用会调用Lambda表达式的右边部分（实际上是run方法），所以这个线程会打印0-99的数字。后续打算再写一篇关于Thread源码的分析，敬请期待。
