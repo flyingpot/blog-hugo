@@ -26,7 +26,7 @@ url = "/post/bloomfilter"
 
 那么HashSet是如何实现add过程的去重和contains方法的呢？这时候就需要看代码了。可以发现HashSet实际上是复用了HashMap的方法（定义了一个空对象PRESENT填充到value中，十分巧妙）：
 
-```java
+```
     private transient HashMap<E,Object> map;
 
     // Dummy value to associate with an Object in the backing Map
@@ -49,7 +49,7 @@ url = "/post/bloomfilter"
 
 那么就看一下HashMap的put和containsKey方法是如何实现的：
 
-```Java
+```
 	public V put(K key, V value) {
         return putVal(hash(key), key, value, false, true);
     }
