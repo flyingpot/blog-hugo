@@ -1,6 +1,5 @@
 +++
 date = 2020-11-28T16:00:00Z
-draft = true
 title = "对于Linux中oom-killer的简单探究"
 url = "/post/oom-killer"
 
@@ -245,7 +244,7 @@ Linux的内存是先申请，然后再按需分配的，所以有可能一个进
 
 ### 三、oom killer如何决定杀哪个进程
 
-还是看源码：
+继续看源码：
 
     /*
      * Simple selection loop. We choose the process with the highest number of
@@ -368,4 +367,9 @@ Linux的内存是先申请，然后再按需分配的，所以有可能一个进
     	return points;
     }
 
-可以看出来计算了rss, pagetable and swap这三部分的空间占用作为比例计算分数，oom_score_adj
+可以看出来计算了rss, pagetable and swap这三部分的空间占用作为比例计算分数，oom_score_adj作为权重影响分数，具体的数值可以通过/proc/<pid>/oom_score_adj文件来修改。也就是说当这个值保持默认的情况下，oom killer实际杀掉的进程时内存占用最多的那个进程。
+这其实是很符合逻辑的，当oom要发生时，肯定是杀掉内存占用最多的进程是最有效率的。否则可能需要多次触发oom killer才能解决oom的问题。如果要保护一个进程不被oom killer杀掉，其实最好的方法只能是增加内存了，因为即使修改了oom_score_adj参数，当单独这个进程需要的内存就超过总内存大小时，无论怎么触发oom killer都是无济于事的。
+
+### 四、总结
+
+这次主要有两点体会：一是把oom killer的逻辑梳理清晰的感觉还是很爽的，在这个过程中我通过读Linux内核源码的方式理解了很多内容。很多时候人都会因为畏难而读源码，遇到问题喜欢用查资料的方式解决。实际上对于这类问题，看源码的方式也很有效率，并且能避免很多误解。二是Linux源码写的真的很不错，注释丰富，结构清晰，就连我这样对内核基本一窍不通的人也能理解很多内容，以后有机会多读下Linux源码。
