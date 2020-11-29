@@ -101,7 +101,7 @@ Linux的内存是先申请，然后再按需分配的，所以有可能一个进
 
 实际上能看出来是否触发oom killer跟这个参数根本没有关系，修改这个参数只会影响一个进程能否申请到内存的逻辑。值为1条件最宽松，值为0条件次之，值为2最严格，仅此而已。我之前被网上的一些信息误导了，让我以为这个参数与oom killer的执行逻辑有关，直到我读了一下代码才明白其中缘由。
 
-那么是什么来决定oom killer的逻辑呢？这就涉及到另一个内核参数了。
+那么是什么来决定是否触发oom killer？这就涉及到另一个内核参数了。
 
 ### 二、Linux OOM处理逻辑参数vm.panic_on_oom
 
@@ -189,6 +189,183 @@ Linux的内存是先申请，然后再按需分配的，所以有可能一个进
     	return !!oc->chosen;
     }
 
-其中方法注释写的很有意思：实际上当物理内存不足要发生时，对于操作系统来说没什么选择，要么随机杀进程(bad)，要么让系统崩溃(worse)，要么通过一种更聪明的方式杀进程释放出内存。在这时没有完美的(perfect)选择，只有好的(good)选择。的确，在一般情况下，杀进程确实要比让系统崩溃更好，这也是一种无奈的办法了。
+这个方法注释写的很有意思：实际上当物理内存不足要发生时，对于操作系统来说没什么选择，要么随机杀进程(bad)，要么让系统崩溃(worse)，要么通过一种更聪明的方式杀进程释放出内存。在这时没有完美的(perfect)选择，只有好的(good)选择。的确，在一般情况下，杀进程确实要比让系统崩溃更好，这也是一种无奈的办法了。
 
-当然，操作系统不会帮用户决定这种重要的事情，vm.panic_on_
+当然，操作系统不会帮用户决定这种重要的事情，可以通过修改内核参数vm.panic_on_oom的方式更改逻辑。
+
+还是看一下[内核文档](https://www.kernel.org/doc/Documentation/sysctl/vm.txt)：
+
+    panic_on_oom
+    
+    This enables or disables panic on out-of-memory feature.
+    If this is set to 0, the kernel will kill some rogue process,
+    called oom_killer.  Usually, oom_killer can kill rogue processes and
+    system will survive.
+    
+    If this is set to 1, the kernel panics when out-of-memory happens.
+    However, if a process limits using nodes by mempolicy/cpusets,
+    and those nodes become memory exhaustion status, one process
+    may be killed by oom-killer. No panic occurs in this case.
+    Because other nodes' memory may be free. This means system total status
+    may be not fatal yet.
+    
+    If this is set to 2, the kernel panics compulsorily even on the
+    above-mentioned. Even oom happens under memory cgroup, the whole
+    system panics.
+    
+    The default value is 0.
+
+当值为0时，oom killer是开启状态，值为1时，只是在一些情况下使用oom killer，值为2不使用oom killer，也就是说系统总是会触发kernal panic。
+
+还是看下源码：
+
+    /*
+     * Determines whether the kernel must panic because of the panic_on_oom sysctl.
+     */
+    static void check_panic_on_oom(struct oom_control *oc) // 这个函数正常返回之后会触发oom killer
+    {
+    	if (likely(!sysctl_panic_on_oom))
+    		return; // 0的时候直接返回，触发oom killer
+    	if (sysctl_panic_on_oom != 2) {
+    		/*
+    		 * panic_on_oom == 1 only affects CONSTRAINT_NONE, the kernel
+    		 * does not panic for cpuset, mempolicy, or memcg allocation
+    		 * failures.
+    		 */
+    		if (oc->constraint != CONSTRAINT_NONE)
+    			return; // 1的时候，在一定条件下触发oom killer
+    	}
+    	/* Do not panic for oom kills triggered by sysrq */
+    	if (is_sysrq_oom(oc))
+    		return;
+    	dump_header(oc, NULL);
+    	panic("Out of memory: %s panic_on_oom is enabled\n",
+    		sysctl_panic_on_oom == 2 ? "compulsory" : "system-wide"); // 这里触发了kernel panic
+    }
+
+### 三、oom killer如何决定杀哪个进程
+
+还是看源码：
+
+    /*
+     * Simple selection loop. We choose the process with the highest number of
+     * 'points'. In case scan was aborted, oc->chosen is set to -1.
+     */
+    static void select_bad_process(struct oom_control *oc)
+    {
+    	oc->chosen_points = LONG_MIN;
+    
+    	if (is_memcg_oom(oc))
+    		mem_cgroup_scan_tasks(oc->memcg, oom_evaluate_task, oc);
+    	else {
+    		struct task_struct *p;
+    
+    		rcu_read_lock();
+    		for_each_process(p)
+    			if (oom_evaluate_task(p, oc))
+    				break; // 遍历进程，调用oom_evaluate_task函数，返回非0时跳出，说明选择到了要杀的进程
+    		rcu_read_unlock();
+    }
+    
+    static int oom_evaluate_task(struct task_struct *task, void *arg)
+    {
+    	struct oom_control *oc = arg;
+    	long points;
+    
+    	if (oom_unkillable_task(task))
+    		goto next;
+    
+    	/* p may not have freeable memory in nodemask */
+    	if (!is_memcg_oom(oc) && !oom_cpuset_eligible(task, oc))
+    		goto next;
+    
+    	/*
+    	 * This task already has access to memory reserves and is being killed.
+    	 * Don't allow any other task to have access to the reserves unless
+    	 * the task has MMF_OOM_SKIP because chances that it would release
+    	 * any memory is quite low.
+    	 */
+    	if (!is_sysrq_oom(oc) && tsk_is_oom_victim(task)) {
+    		if (test_bit(MMF_OOM_SKIP, &task->signal->oom_mm->flags))
+    			goto next;
+    		goto abort;
+    	}
+    
+    	/*
+    	 * If task is allocating a lot of memory and has been marked to be
+    	 * killed first if it triggers an oom, then select it.
+    	 */
+    	if (oom_task_origin(task)) {
+    		points = LONG_MAX;
+    		goto select;
+    	}
+    
+    	points = oom_badness(task, oc->totalpages); // 通过oom_badness算出分数，存一个最大的
+    	if (points == LONG_MIN || points < oc->chosen_points)
+    		goto next;
+    
+    select: // 有更大的分数进入这个逻辑
+    	if (oc->chosen)
+    		put_task_struct(oc->chosen);
+    	get_task_struct(task);
+    	oc->chosen = task;
+    	oc->chosen_points = points;
+    next: // 跳过这次循环
+    	return 0;
+    abort: // 跳出逻辑
+    	if (oc->chosen)
+    		put_task_struct(oc->chosen);
+    	oc->chosen = (void *)-1UL;
+    	return 1;
+    }
+    
+    /**
+     * oom_badness - heuristic function to determine which candidate task to kill
+     * @p: task struct of which task we should calculate
+     * @totalpages: total present RAM allowed for page allocation
+     *
+     * The heuristic for determining which task to kill is made to be as simple and
+     * predictable as possible.  The goal is to return the highest value for the
+     * task consuming the most memory to avoid subsequent oom failures.
+     */
+    long oom_badness(struct task_struct *p, unsigned long totalpages)
+    {
+    	long points;
+    	long adj;
+    
+    	if (oom_unkillable_task(p))
+    		return LONG_MIN;
+    
+    	p = find_lock_task_mm(p);
+    	if (!p)
+    		return LONG_MIN;
+    
+    	/*
+    	 * Do not even consider tasks which are explicitly marked oom
+    	 * unkillable or have been already oom reaped or the are in
+    	 * the middle of vfork
+    	 */
+    	adj = (long)p->signal->oom_score_adj;
+    	if (adj == OOM_SCORE_ADJ_MIN ||
+    			test_bit(MMF_OOM_SKIP, &p->mm->flags) ||
+    			in_vfork(p)) {
+    		task_unlock(p);
+    		return LONG_MIN;
+    	}
+    
+    	/*
+    	 * The baseline for the badness score is the proportion of RAM that each
+    	 * task's rss, pagetable and swap space use.
+    	 */
+    	points = get_mm_rss(p->mm) + get_mm_counter(p->mm, MM_SWAPENTS) +
+    		mm_pgtables_bytes(p->mm) / PAGE_SIZE;
+    	task_unlock(p);
+    
+    	/* Normalize to oom_score_adj units */
+    	adj *= totalpages / 1000;
+    	points += adj;
+    
+    	return points;
+    }
+
+可以看出来计算了rss, pagetable and swap这三部分的空间占用作为比例计算分数，oom_score_adj
