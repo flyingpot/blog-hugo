@@ -40,6 +40,7 @@ Linux的内存是先申请，然后再按需分配的，所以有可能一个进
 
 代码如下：
 
+```c
     /*
      * Check that a process has enough memory to allocate a new virtual
      * mapping. 0 means there is enough memory for the allocation to
@@ -97,6 +98,7 @@ Linux的内存是先申请，然后再按需分配的，所以有可能一个进
     
     	return -ENOMEM;
     }
+```
 
 实际上能看出来是否触发oom killer跟这个参数根本没有关系，修改这个参数只会影响一个进程能否申请到内存的逻辑。值为1条件最宽松，值为0条件次之，值为2最严格，仅此而已。我之前被网上的一些信息误导了，让我以为这个参数与oom killer的执行逻辑有关，直到我读了一下代码才明白其中缘由。
 
@@ -106,6 +108,7 @@ Linux的内存是先申请，然后再按需分配的，所以有可能一个进
 
 当实际物理内存不足时，会进入以下逻辑进行处理（oom_kill.c）：
 
+```c
     /**
      * out_of_memory - kill the "best" process when we run out of memory
      * @oc: pointer to struct oom_control
@@ -187,6 +190,7 @@ Linux的内存是先申请，然后再按需分配的，所以有可能一个进
     				 "Memory cgroup out of memory");
     	return !!oc->chosen;
     }
+```
 
 这个方法注释写的很有意思：实际上当物理内存不足要发生时，对于操作系统来说没什么选择，要么随机杀进程(bad)，要么让系统崩溃(worse)，要么通过一种更聪明的方式杀进程释放出内存。在这时没有完美的(perfect)选择，只有好的(good)选择。的确，在一般情况下，杀进程确实要比让系统崩溃更好，这也是一种无奈的办法了。
 
@@ -218,6 +222,7 @@ Linux的内存是先申请，然后再按需分配的，所以有可能一个进
 
 还是看下源码：
 
+```c
     /*
      * Determines whether the kernel must panic because of the panic_on_oom sysctl.
      */
@@ -241,11 +246,13 @@ Linux的内存是先申请，然后再按需分配的，所以有可能一个进
     	panic("Out of memory: %s panic_on_oom is enabled\n",
     		sysctl_panic_on_oom == 2 ? "compulsory" : "system-wide"); // 这里触发了kernel panic
     }
+```
 
 ### 三、oom killer如何决定杀哪个进程
 
 继续看源码：
 
+```c
     /*
      * Simple selection loop. We choose the process with the highest number of
      * 'points'. In case scan was aborted, oc->chosen is set to -1.
@@ -366,6 +373,7 @@ Linux的内存是先申请，然后再按需分配的，所以有可能一个进
     
     	return points;
     }
+```
 
 可以看出来计算了rss, pagetable and swap这三部分的空间占用作为比例计算分数，oom_score_adj作为权重影响分数，具体的数值可以通过/proc/\<pid>/oom_score_adj文件来修改。也就是说当这个值保持默认的情况下，oom killer实际杀掉的进程时内存占用最多的那个进程。
 这其实是很符合逻辑的，当oom要发生时，肯定是杀掉内存占用最多的进程是最有效率的。否则可能需要多次触发oom killer才能解决oom的问题。如果要保护一个进程不被oom killer杀掉，其实最好的方法只能是增加内存了，因为即使修改了oom_score_adj参数，当单独这个进程需要的内存就超过总内存大小时，无论怎么触发oom killer都是无济于事的。
