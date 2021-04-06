@@ -1,0 +1,62 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=generator content="Hugo 0.82.0"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=author content="Fan Jingbo"><meta property="og:url" content="https://fanjingbo.com/post/java-anonymous-class-lambda-method-reference/"><link rel=canonical href=https://fanjingbo.com/post/java-anonymous-class-lambda-method-reference/><link rel=preload href=/js/highlight.pack.js as=script><link rel=alternate type=application/atom+xml href=https://fanjingbo.comindex.xml title="Fan Jingbo's Blog"><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/fanjingbo.com"},"articleSection":"post","name":"Java的匿名类、匿名函数与方法引用","headline":"Java的匿名类、匿名函数与方法引用","description":"一、前言 从我接触Java伊始，就见过了很多匿名函数，最典型的是Java的多线程，写法如下：\n new Thread(() -\u0026gt; { for (int i = 0; i \u0026lt; 100; i\u002b\u002b) { System.out.println(i); } }).start();  起初我十分不理解这是一种什么写法，经过查询也只知道这是一种叫Lambda函数的东西，看了很多文章之后也没能很好的理解。现在是终于搞懂了，所以写一篇总结来帮助我梳理一下相关知识。\n二、匿名类与匿名函数 匿名类，顾名思义就是没有类名字的类。匿名函数相对应的就是没有名字的函数。因为没有名字，两者都适用于定义一个不需要被重用的类或者方法的场景。其实这两者是共通的。在我的理解里，匿名函数是对匿名内部类的进一步简化抽象。对于匿名类来说，一般都是需要实现多个方法时使用的。例子如下：\ninterface Pet { String getName(); String getAge(); } class PetShop { static void sell (Pet pet) { System.out.println(\u0026quot;Pet name is \u0026quot; \u002b pet.getName() \u002b \u0026quot;\\nPet age is \u0026quot; \u002b pet.getAge()); } public static void main(String[] args) { PetShop.sell(new Pet() { @Override public String getName() { return \u0026quot;Ruby\u0026quot;; } @Override public String getAge() { return \u0026quot;10\u0026quot;; } }); } }  可以看到，在这个例子中，PetShop这个类的sell方法会用到Pet接口的实现类，但是这个实现类只需要使用一次，不需要复用（因为这里面逻辑是出售）。在这种情况下就可以使用匿名类，在不定义类名的情况下实现两个方法即可。","inLanguage":"en-US","author":"Fan Jingbo","creator":"Fan Jingbo","publisher":"Fan Jingbo","accountablePerson":"Fan Jingbo","copyrightHolder":"Fan Jingbo","copyrightYear":"2020","datePublished":"2020-11-07 16:00:00 \u002b0000 UTC","dateModified":"2020-11-07 16:00:00 \u002b0000 UTC","url":"https:\/\/fanjingbo.com\/post\/java-anonymous-class-lambda-method-reference\/","keywords":[]}</script><title>Java的匿名类、匿名函数与方法引用 - Fan Jingbo's Blog</title><meta property="og:title" content="Java的匿名类、匿名函数与方法引用 - Fan Jingbo's Blog"><meta property="og:type" content="article"><meta property="og:description" content="一、前言 从我接触Java伊始，就见过了很多匿名函数，最典型的是Java的多线程，写法如下：
+ new Thread(() -> { for (int i = 0; i < 100; i++) { System.out.println(i); } }).start();  起初我十分不理解这是一种什么写法，经过查询也只知道这是一种叫Lambda函数的东西，看了很多文章之后也没能很好的理解。现在是终于搞懂了，所以写一篇总结来帮助我梳理一下相关知识。
+二、匿名类与匿名函数 匿名类，顾名思义就是没有类名字的类。匿名函数相对应的就是没有名字的函数。因为没有名字，两者都适用于定义一个不需要被重用的类或者方法的场景。其实这两者是共通的。在我的理解里，匿名函数是对匿名内部类的进一步简化抽象。对于匿名类来说，一般都是需要实现多个方法时使用的。例子如下：
+interface Pet { String getName(); String getAge(); } class PetShop { static void sell (Pet pet) { System.out.println(&#34;Pet name is &#34; + pet.getName() + &#34;\nPet age is &#34; + pet.getAge()); } public static void main(String[] args) { PetShop.sell(new Pet() { @Override public String getName() { return &#34;Ruby&#34;; } @Override public String getAge() { return &#34;10&#34;; } }); } }  可以看到，在这个例子中，PetShop这个类的sell方法会用到Pet接口的实现类，但是这个实现类只需要使用一次，不需要复用（因为这里面逻辑是出售）。在这种情况下就可以使用匿名类，在不定义类名的情况下实现两个方法即可。"><meta name=description content="一、前言 从我接触Java伊始，就见过了很多匿名函数，最典型的是Java的多线程，写法如下：
+ new Thread(() -> { for (int i = 0; i < 100; i++) { System.out.println(i); } }).start();  起初我十分不理解这是一种什么写法，经过查询也只知道这是一种叫Lambda函数的东西，看了很多文章之后也没能很好的理解。现在是终于搞懂了，所以写一篇总结来帮助我梳理一下相关知识。
+二、匿名类与匿名函数 匿名类，顾名思义就是没有类名字的类。匿名函数相对应的就是没有名字的函数。因为没有名字，两者都适用于定义一个不需要被重用的类或者方法的场景。其实这两者是共通的。在我的理解里，匿名函数是对匿名内部类的进一步简化抽象。对于匿名类来说，一般都是需要实现多个方法时使用的。例子如下：
+interface Pet { String getName(); String getAge(); } class PetShop { static void sell (Pet pet) { System.out.println(&#34;Pet name is &#34; + pet.getName() + &#34;\nPet age is &#34; + pet.getAge()); } public static void main(String[] args) { PetShop.sell(new Pet() { @Override public String getName() { return &#34;Ruby&#34;; } @Override public String getAge() { return &#34;10&#34;; } }); } }  可以看到，在这个例子中，PetShop这个类的sell方法会用到Pet接口的实现类，但是这个实现类只需要使用一次，不需要复用（因为这里面逻辑是出售）。在这种情况下就可以使用匿名类，在不定义类名的情况下实现两个方法即可。"><meta property="og:locale" content="en-us"><link rel=stylesheet href=/css/flexboxgrid-6.3.1.min.css><link rel=stylesheet href=/css/github-markdown.css><link rel=stylesheet href=/css/highlight/tomorrow.min.css><link rel=stylesheet href=/css/index.css><link href=/index.xml rel=alternate type=application/rss+xml title="Fan Jingbo's Blog"><link href="https://fonts.googleapis.com/css?family=Arvo|Permanent+Marker|Bree+Serif&display=swap" rel=stylesheet></head><body><article class="post Chinese" id=article><div class=row><div class=col-xs-12><div class=site-header><header><div class="signatures site-title"><a href=/>Fan Jingbo</a></div></header><div class="row end-xs"></div><div class=header-line></div></div><header class=post-header><h1 class=post-title>Java的匿名类、匿名函数与方法引用</h1><div class="row post-desc"><div class=col-xs-6><time class=post-date datetime="2020-11-07 16:00:00 UTC">07 Nov 2020</time></div><div class=col-xs-6><div class=post-author><a target=_blank href=https://fanjingbo.com>@Fan Jingbo</a></div></div></div></header><div class="post-content markdown-body"><h3 id=一前言>一、前言</h3><p>从我接触Java伊始，就见过了很多匿名函数，最典型的是Java的多线程，写法如下：</p><pre><code>        new Thread(() -&gt; {
+            for (int i = 0; i &lt; 100; i++) {
+                System.out.println(i);
+            }
+        }).start();
+</code></pre><p>起初我十分不理解这是一种什么写法，经过查询也只知道这是一种叫Lambda函数的东西，看了很多文章之后也没能很好的理解。现在是终于搞懂了，所以写一篇总结来帮助我梳理一下相关知识。</p><h3 id=二匿名类与匿名函数>二、匿名类与匿名函数</h3><p>匿名类，顾名思义就是没有类名字的类。匿名函数相对应的就是没有名字的函数。因为没有名字，两者都适用于定义一个不需要被重用的类或者方法的场景。其实这两者是共通的。在我的理解里，匿名函数是对匿名内部类的进一步简化抽象。对于匿名类来说，一般都是需要实现多个方法时使用的。例子如下：</p><pre><code>interface Pet {
+    String getName();
+    String getAge();
+}
+
+class PetShop {
+    static void sell (Pet pet) {
+        System.out.println(&quot;Pet name is &quot; + pet.getName()
+                + &quot;\nPet age is &quot; + pet.getAge());
+    }
+
+    public static void main(String[] args) {
+        PetShop.sell(new Pet() {
+            @Override
+            public String getName() {
+                return &quot;Ruby&quot;;
+            }
+
+            @Override
+            public String getAge() {
+                return &quot;10&quot;;
+            }
+        });
+    }
+}
+</code></pre><p>可以看到，在这个例子中，PetShop这个类的sell方法会用到Pet接口的实现类，但是这个实现类只需要使用一次，不需要复用（因为这里面逻辑是出售）。在这种情况下就可以使用匿名类，在不定义类名的情况下实现两个方法即可。</p><p>但是在只需要实现接口一个方法的情况下，我们可以简化上面的使用方式，使用匿名函数，也就是Lambda表达式：</p><pre><code>interface Pet {
+    String getName();
+}
+
+class PetShop {
+    static void sell (Pet pet) {
+        System.out.println(&quot;Pet name is &quot; + pet.getName());
+    }
+
+    public static void main(String[] args) {
+        PetShop.sell(() -&gt; &quot;Ruby&quot;);
+    }
+}
+</code></pre><p>使用了Lambda表达式之后一下子少了很多行代码。Lambda表达式分为两部分，用->分开，左边是方法的参数，右边是返回值。相比匿名类的实现方式，删除了接口信息和方法名。其实仔细想想就知道为什么这些东西都能删掉。接口信息在sell方法中有定义，方法调用也有，并且由于只有一种方法需要实现，所以根本不需要纠结，只需要把Lambda右边的返回值赋值给pet.getName()就好了。</p><p>再用Comparator接口举个例子：</p><pre><code>List&lt;Integer&gt; integers = new ArrayList&lt;&gt;(Arrays.asList(5, 4, 3, 2, 1, 0));
+Comparator&lt;Integer&gt; comparator1 = new Comparator&lt;Integer&gt;() {
+    @Override
+    public int compare(Integer o1, Integer o2) {
+        return o1.compareTo(o2);
+    }
+};
+Comparator&lt;Integer&gt; comparator2 = (o1, o2) -&gt; o1 &gt; o2 ? 1 : 0;
+integers.sort(comparator1);
+integers.sort(comparator2);
+</code></pre><p>Comparator中需要实现compare方法，而sort里面需要传入一个Comparator实例，最终实例的compare方法会被调用，来决定排序的规则。可以用匿名类和匿名函数两种方式来实现，这种情况下自然是Lambda表达式更简洁了。但是说实话对于不了解的人来说，Lambda表达式还是有着一定的理解门槛的。</p><h3 id=三方法引用>三、方法引用</h3><p>匿名函数Lambda表达式其实仍然不是最简化的调用方法，因为我们可以发现参数有可能也可以省略，这就是所谓的方法引用，还是拿Comparator举例子：</p><pre><code>Comparator&lt;Integer&gt; comparator3 = Integer::compareTo;
+integers.sort(comparator3);
+</code></pre><p>可以看到，方法引用省去了参数，直接使用类::方法的形式实现匿名函数的效果。这里的方法可以是静态方法，也可以是实例方法（就如同这个例子一样，第一个参数是实例方法的调用者，第二个参数是实例函数的参数），甚至类也可以是一个实例，非常灵活。</p><p>对于具体参数如何调用的，可以参考以下三句话：</p><ol><li>成员方法的方法签名，前面会追加 this 的类型。</li><li>静态方法的方法签名，因为没有 this, 不会追加任何东西。</li><li>当 :: 前是一个实例时，这个实例会作为第一个参数给绑定到目标方法签名上。</li></ol><p>但是对于一些不带参数的方法调用，方法引用也不太好用，比如文章刚开始的多线程例子就没法使用方法引用的方式表达。</p><h3 id=四总结>四、总结</h3><p>可以看出，匿名类、匿名函数与方法引用三者抽象程度越来越高，适用范围越来越小。经过这一番探究，现在再回头看文章第一部分的多线程代码就十分简单了：start()调用会调用Lambda表达式的右边部分（实际上是run方法），所以这个线程会打印0-99的数字。后续打算再写一篇关于Thread源码的分析，敬请期待。</p></div><div class="row middle-xs"><div class=col-xs-12></div></div><div class=row><div class=col-xs-12></div></div><div style=height:50px></div><div class=site-footer><div class=site-footer-item><a href=http://beian.miit.gov.cn target=_blank>粤ICP备18020202号-1</a></div><div class=site-footer-item><a href=https://github.com/flyingpot target=_blank>Github</a></div></div></div></div></article><script src=/js/highlight.pack.js></script><script>hljs.initHighlightingOnLoad()</script></body></html>

@@ -1,0 +1,85 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=generator content="Hugo 0.82.0"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=author content="Fan Jingbo"><meta property="og:url" content="https://fanjingbo.com/post/travis-ci_to_cos/"><link rel=canonical href=https://fanjingbo.com/post/travis-ci_to_cos/><link rel=preload href=/js/highlight.pack.js as=script><link rel=alternate type=application/atom+xml href=https://fanjingbo.comindex.xml title="Fan Jingbo's Blog"><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/fanjingbo.com"},"articleSection":"post","name":"travis-ci自动部署博客到腾讯云COS","headline":"travis-ci自动部署博客到腾讯云COS","description":"我的博客使用的是hugo，博客一直放在腾讯云COS上，只要域名备案就能使用，加上CDN速度也不错。但是使用腾讯云COS更新博客，需要登录腾讯云控制台，手动把本地hugo生成的文件上传到COS上，十分痛苦并且一点也不geek。与之形成鲜明对比的就是netlify，部署十分方便，只要把hugo文件夹设置成github repo，仓库一更新，网站就会自动部署。再搭配上forestry.io的hugo cms，博客更新就可以完全放在云上。因此我就想该如何解放双手，将上传过程简化。持续集成服务（Continuous Integration, CI）就是一个好的选择。\nTravis CI 因为之前看到别人github的repo里面有.travis.yml文件，对于Travis CI有一定了解，因此我决定使用这个持续集成服务。在简单看了文档之后，我发现配置十分智能，直接使用github账号登录，然后就可以绑定对应的repo。之后就可以在对应repo里面加入.travis.yml文件，在这个文件里面就可以加入脚本等内容，Travis CI就会根据这个配置文件进行对应的构建和部署。\n举个例子：\nlanguage: python python: - \u0026#34;2.6\u0026#34; - \u0026#34;2.7\u0026#34; - \u0026#34;3.3\u0026#34; - \u0026#34;3.4\u0026#34; - \u0026#34;3.5\u0026#34; - \u0026#34;3.5-dev\u0026#34; # 3.5 development branch - \u0026#34;3.6\u0026#34; - \u0026#34;3.6-dev\u0026#34; # 3.6 development branch # command to install dependencies install: - pip install -r requirements.txt # command to run tests script: - pytest 可以看到，配置文件中可以设置语言和版本，安装依赖并且运行脚本，相当的自由。我们的构建环境需要Go和Python两个环境（需要hugo生成静态文件，需要Python上传静态文件到腾讯COS），Travis CI是可以使用两种语言环境的，如下：\nmatrix: include: - language: go ... - language: python ...  但是在尝试的过程中遇到了两个问题，一个是golang和hugo在Travis CI中的构建过程太慢","inLanguage":"en-US","author":"Fan Jingbo","creator":"Fan Jingbo","publisher":"Fan Jingbo","accountablePerson":"Fan Jingbo","copyrightHolder":"Fan Jingbo","copyrightYear":"2019","datePublished":"2019-04-05 03:00:00 \u002b0000 UTC","dateModified":"2019-04-05 03:00:00 \u002b0000 UTC","url":"https:\/\/fanjingbo.com\/post\/travis-ci_to_cos\/","keywords":[]}</script><title>travis-ci自动部署博客到腾讯云COS - Fan Jingbo's Blog</title><meta property="og:title" content="travis-ci自动部署博客到腾讯云COS - Fan Jingbo's Blog"><meta property="og:type" content="article"><meta property="og:description" content="我的博客使用的是hugo，博客一直放在腾讯云COS上，只要域名备案就能使用，加上CDN速度也不错。但是使用腾讯云COS更新博客，需要登录腾讯云控制台，手动把本地hugo生成的文件上传到COS上，十分痛苦并且一点也不geek。与之形成鲜明对比的就是netlify，部署十分方便，只要把hugo文件夹设置成github repo，仓库一更新，网站就会自动部署。再搭配上forestry.io的hugo cms，博客更新就可以完全放在云上。因此我就想该如何解放双手，将上传过程简化。持续集成服务（Continuous Integration, CI）就是一个好的选择。
+Travis CI 因为之前看到别人github的repo里面有.travis.yml文件，对于Travis CI有一定了解，因此我决定使用这个持续集成服务。在简单看了文档之后，我发现配置十分智能，直接使用github账号登录，然后就可以绑定对应的repo。之后就可以在对应repo里面加入.travis.yml文件，在这个文件里面就可以加入脚本等内容，Travis CI就会根据这个配置文件进行对应的构建和部署。
+举个例子：
+language: python python: - &#34;2.6&#34; - &#34;2.7&#34; - &#34;3.3&#34; - &#34;3.4&#34; - &#34;3.5&#34; - &#34;3.5-dev&#34; # 3.5 development branch - &#34;3.6&#34; - &#34;3.6-dev&#34; # 3.6 development branch # command to install dependencies install: - pip install -r requirements.txt # command to run tests script: - pytest 可以看到，配置文件中可以设置语言和版本，安装依赖并且运行脚本，相当的自由。我们的构建环境需要Go和Python两个环境（需要hugo生成静态文件，需要Python上传静态文件到腾讯COS），Travis CI是可以使用两种语言环境的，如下：
+matrix: include: - language: go ... - language: python ...  但是在尝试的过程中遇到了两个问题，一个是golang和hugo在Travis CI中的构建过程太慢"><meta name=description content="我的博客使用的是hugo，博客一直放在腾讯云COS上，只要域名备案就能使用，加上CDN速度也不错。但是使用腾讯云COS更新博客，需要登录腾讯云控制台，手动把本地hugo生成的文件上传到COS上，十分痛苦并且一点也不geek。与之形成鲜明对比的就是netlify，部署十分方便，只要把hugo文件夹设置成github repo，仓库一更新，网站就会自动部署。再搭配上forestry.io的hugo cms，博客更新就可以完全放在云上。因此我就想该如何解放双手，将上传过程简化。持续集成服务（Continuous Integration, CI）就是一个好的选择。
+Travis CI 因为之前看到别人github的repo里面有.travis.yml文件，对于Travis CI有一定了解，因此我决定使用这个持续集成服务。在简单看了文档之后，我发现配置十分智能，直接使用github账号登录，然后就可以绑定对应的repo。之后就可以在对应repo里面加入.travis.yml文件，在这个文件里面就可以加入脚本等内容，Travis CI就会根据这个配置文件进行对应的构建和部署。
+举个例子：
+language: python python: - &#34;2.6&#34; - &#34;2.7&#34; - &#34;3.3&#34; - &#34;3.4&#34; - &#34;3.5&#34; - &#34;3.5-dev&#34; # 3.5 development branch - &#34;3.6&#34; - &#34;3.6-dev&#34; # 3.6 development branch # command to install dependencies install: - pip install -r requirements.txt # command to run tests script: - pytest 可以看到，配置文件中可以设置语言和版本，安装依赖并且运行脚本，相当的自由。我们的构建环境需要Go和Python两个环境（需要hugo生成静态文件，需要Python上传静态文件到腾讯COS），Travis CI是可以使用两种语言环境的，如下：
+matrix: include: - language: go ... - language: python ...  但是在尝试的过程中遇到了两个问题，一个是golang和hugo在Travis CI中的构建过程太慢"><meta property="og:locale" content="en-us"><link rel=stylesheet href=/css/flexboxgrid-6.3.1.min.css><link rel=stylesheet href=/css/github-markdown.css><link rel=stylesheet href=/css/highlight/tomorrow.min.css><link rel=stylesheet href=/css/index.css><link href=/index.xml rel=alternate type=application/rss+xml title="Fan Jingbo's Blog"><link href="https://fonts.googleapis.com/css?family=Arvo|Permanent+Marker|Bree+Serif&display=swap" rel=stylesheet></head><body><article class="post Chinese" id=article><div class=row><div class=col-xs-12><div class=site-header><header><div class="signatures site-title"><a href=/>Fan Jingbo</a></div></header><div class="row end-xs"></div><div class=header-line></div></div><header class=post-header><h1 class=post-title>travis-ci自动部署博客到腾讯云COS</h1><div class="row post-desc"><div class=col-xs-6><time class=post-date datetime="2019-04-05 03:00:00 UTC">05 Apr 2019</time></div><div class=col-xs-6><div class=post-author><a target=_blank href=https://fanjingbo.com>@Fan Jingbo</a></div></div></div></header><div class="post-content markdown-body"><p>我的博客使用的是hugo，博客一直放在腾讯云COS上，只要域名备案就能使用，加上CDN速度也不错。但是使用腾讯云COS更新博客，需要登录腾讯云控制台，手动把本地hugo生成的文件上传到COS上，十分痛苦并且一点也不geek。与之形成鲜明对比的就是netlify，部署十分方便，只要把hugo文件夹设置成github repo，仓库一更新，网站就会自动部署。再搭配上<a href=https://forestry.io/>forestry.io</a>的hugo cms，博客更新就可以完全放在云上。因此我就想该如何解放双手，将上传过程简化。持续集成服务（Continuous Integration, CI）就是一个好的选择。</p><h1 id=travis-ci>Travis CI</h1><p>因为之前看到别人github的repo里面有.travis.yml文件，对于Travis CI有一定了解，因此我决定使用这个持续集成服务。在简单看了文档之后，我发现配置十分智能，直接使用github账号登录，然后就可以绑定对应的repo。之后就可以在对应repo里面加入.travis.yml文件，在这个文件里面就可以加入脚本等内容，Travis CI就会根据这个配置文件进行对应的构建和部署。</p><p>举个例子：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>language</span>: <span style=color:#ae81ff>python</span>
+<span style=color:#f92672>python</span>:
+  - <span style=color:#e6db74>&#34;2.6&#34;</span>
+  - <span style=color:#e6db74>&#34;2.7&#34;</span>
+  - <span style=color:#e6db74>&#34;3.3&#34;</span>
+  - <span style=color:#e6db74>&#34;3.4&#34;</span>
+  - <span style=color:#e6db74>&#34;3.5&#34;</span>
+  - <span style=color:#e6db74>&#34;3.5-dev&#34;</span>  <span style=color:#75715e># 3.5 development branch</span>
+  - <span style=color:#e6db74>&#34;3.6&#34;</span>
+  - <span style=color:#e6db74>&#34;3.6-dev&#34;</span>  <span style=color:#75715e># 3.6 development branch</span>
+<span style=color:#75715e># command to install dependencies</span>
+<span style=color:#f92672>install</span>:
+  - <span style=color:#ae81ff>pip install -r requirements.txt</span>
+<span style=color:#75715e># command to run tests</span>
+<span style=color:#f92672>script</span>:
+  - <span style=color:#ae81ff>pytest</span>
+</code></pre></div><p>可以看到，配置文件中可以设置语言和版本，安装依赖并且运行脚本，相当的自由。我们的构建环境需要Go和Python两个环境（需要hugo生成静态文件，需要Python上传静态文件到腾讯COS），Travis CI是可以使用两种语言环境的，如下：</p><pre><code>matrix:
+  include:
+    - language: go
+      ...
+    - language: python
+      ...
+</code></pre><p>但是在尝试的过程中遇到了两个问题，一个是golang和hugo在Travis CI中的构建过程太慢</p><p><img src=/images/go_slow.png alt></p><p>另一个问题就很严重了，Travis CI不支持两种语言环境先后构建，只支持的是多语言同时构建。这样就没法满足我的要求。由于我更熟悉Python，所以选择了Python这一种语言环境进行构建。</p><p>那么问题来了，如何在不引入Go环境的情况下安装Hugo呢？其实很简单，Hugo是有deb包的，安装很方便。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>wget https://github.com/gohugoio/hugo/releases/download/v0.54.0/hugo_0.54.0_Linux-64bit.deb
+sudo dpkg -i hugo*.deb
+</code></pre></div><h1 id=使用python脚本上传文件到cos>使用Python脚本上传文件到COS</h1><p>接下来就是利用腾讯云提供的Python SDK上传Hugo生成的网站静态文件。脚本写起来很简单，先把COS中的文件全部删除，然后再将所有静态文件全部上传。</p><p>需要注意的是，由于脚本中需要使用腾讯云的tokens，这些tokens肯定不能用明文存放在repo里。我们可以把tokens放在Travis提供的环境变量中。</p><p>脚本如下：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-Python data-lang=Python><span style=color:#f92672>from</span> qcloud_cos <span style=color:#f92672>import</span> CosConfig
+<span style=color:#f92672>from</span> qcloud_cos <span style=color:#f92672>import</span> CosS3Client
+<span style=color:#f92672>import</span> os
+<span style=color:#f92672>import</span> sys
+<span style=color:#f92672>import</span> logging
+
+logging<span style=color:#f92672>.</span>basicConfig(level<span style=color:#f92672>=</span>logging<span style=color:#f92672>.</span>INFO, stream<span style=color:#f92672>=</span>sys<span style=color:#f92672>.</span>stdout)
+
+secret_id  <span style=color:#f92672>=</span> os<span style=color:#f92672>.</span>environ[<span style=color:#e6db74>&#39;SECRET_ID&#39;</span>]
+secret_key <span style=color:#f92672>=</span> os<span style=color:#f92672>.</span>environ[<span style=color:#e6db74>&#39;SECRET_KEY&#39;</span>]
+region <span style=color:#f92672>=</span> os<span style=color:#f92672>.</span>environ[<span style=color:#e6db74>&#39;REGION&#39;</span>]
+bucket <span style=color:#f92672>=</span> os<span style=color:#f92672>.</span>environ[<span style=color:#e6db74>&#39;BUCKET&#39;</span>]
+token <span style=color:#f92672>=</span> None
+scheme <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;https&#39;</span>
+
+config <span style=color:#f92672>=</span> CosConfig(Region<span style=color:#f92672>=</span>region, SecretId<span style=color:#f92672>=</span>secret_id, SecretKey<span style=color:#f92672>=</span>secret_key, Token<span style=color:#f92672>=</span>token, Scheme<span style=color:#f92672>=</span>scheme)
+
+client <span style=color:#f92672>=</span> CosS3Client(config)
+
+response <span style=color:#f92672>=</span> client<span style=color:#f92672>.</span>list_objects(
+    Bucket<span style=color:#f92672>=</span>bucket
+)
+
+<span style=color:#66d9ef>if</span> <span style=color:#e6db74>&#39;Contents&#39;</span> <span style=color:#f92672>in</span> response:
+    <span style=color:#66d9ef>for</span> metadata <span style=color:#f92672>in</span> response[<span style=color:#e6db74>&#39;Contents&#39;</span>]:
+        response <span style=color:#f92672>=</span> client<span style=color:#f92672>.</span>delete_object(
+            Bucket<span style=color:#f92672>=</span>bucket,
+            Key<span style=color:#f92672>=</span>metadata[<span style=color:#e6db74>&#39;Key&#39;</span>]
+        )
+
+os<span style=color:#f92672>.</span>chdir(<span style=color:#e6db74>&#39;public&#39;</span>)
+
+<span style=color:#66d9ef>for</span> root, _, files <span style=color:#f92672>in</span> os<span style=color:#f92672>.</span>walk(<span style=color:#e6db74>&#39;.&#39;</span>):
+    <span style=color:#66d9ef>for</span> file <span style=color:#f92672>in</span> files:
+        object <span style=color:#f92672>=</span> os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>join(root, file)
+
+        <span style=color:#66d9ef>with</span> open(object, <span style=color:#e6db74>&#39;rb&#39;</span>) <span style=color:#66d9ef>as</span> fp:
+            response <span style=color:#f92672>=</span> client<span style=color:#f92672>.</span>put_object(
+                Bucket<span style=color:#f92672>=</span>bucket,
+                Body<span style=color:#f92672>=</span>fp,
+                Key<span style=color:#f92672>=</span>object
+            )
+</code></pre></div><p>最终的.travis.yml如下：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>language</span>: <span style=color:#ae81ff>python</span>
+<span style=color:#f92672>python</span>:
+  - <span style=color:#e6db74>&#34;3.6&#34;</span>
+<span style=color:#f92672>install</span>:
+  - <span style=color:#ae81ff>wget https://github.com/gohugoio/hugo/releases/download/v0.54.0/hugo_0.54.0_Linux-64bit.deb</span>
+  - <span style=color:#ae81ff>sudo dpkg -i hugo*.deb</span>
+  - <span style=color:#ae81ff>pip install -r requirements.txt</span>
+<span style=color:#f92672>script</span>:
+  - <span style=color:#ae81ff>hugo</span>
+  - <span style=color:#ae81ff>python upload_to_cos.py</span>
+</code></pre></div><p>至此，我们利用Travis CI提供的服务完成了Hugo静态博客的部署，更新博客只需要commit即可。</p></div><div class="row middle-xs"><div class=col-xs-12></div></div><div class=row><div class=col-xs-12></div></div><div style=height:50px></div><div class=site-footer><div class=site-footer-item><a href=http://beian.miit.gov.cn target=_blank>粤ICP备18020202号-1</a></div><div class=site-footer-item><a href=https://github.com/flyingpot target=_blank>Github</a></div></div></div></div></article><script src=/js/highlight.pack.js></script><script>hljs.initHighlightingOnLoad()</script></body></html>

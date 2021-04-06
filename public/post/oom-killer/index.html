@@ -1,0 +1,329 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=generator content="Hugo 0.82.0"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=author content="Fan Jingbo"><meta property="og:url" content="https://fanjingbo.com/post/oom-killer/"><link rel=canonical href=https://fanjingbo.com/post/oom-killer/><link rel=preload href=/js/highlight.pack.js as=script><link rel=alternate type=application/atom+xml href=https://fanjingbo.comindex.xml title="Fan Jingbo's Blog"><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/fanjingbo.com"},"articleSection":"post","name":"对于Linux中oom-killer的简单探究","headline":"对于Linux中oom-killer的简单探究","description":"最近在对Elasticsearch集群进行压力测试的时候发现，当我不停的对集群进行创建索引操作时，集群的master节点总会莫名其妙的挂掉。表现是ES进程退出，并且JVM没有生成相应的dump文件。我陷入了疑惑，后来经过别人指点我才知道原来进程是被Linux中的oom-killer杀掉了。由于之前没有了解过，所以我花了一段时间了解了一下oom-killer的机制，还顺带看了一些Linux源码。\n一、Linux内存分配参数vm.overcommit_memory Linux的内存是先申请，然后再按需分配的，所以有可能一个进程申请了200MB的内存，但是实际只使用了100MB。所以为了最大化内存利用率，Linux支持过度申请，也就是所谓的overcommit。Linux内核通过overcommit_memory这个参数决定对待申请内存的策略，包含三个值，内核文档说明如下：\n0\t-\tHeuristic overcommit handling. Obvious overcommits of address space are refused. Used for a typical system. It ensures a seriously wild allocation fails while allowing overcommit to reduce swap usage. root is allowed to allocate slightly more memory in this mode. This is the default. 1\t-\tAlways overcommit. Appropriate for some scientific applications. Classic example is code using sparse arrays and just relying on the virtual memory consisting almost entirely of zero pages.","inLanguage":"en-US","author":"Fan Jingbo","creator":"Fan Jingbo","publisher":"Fan Jingbo","accountablePerson":"Fan Jingbo","copyrightHolder":"Fan Jingbo","copyrightYear":"2020","datePublished":"2020-11-28 16:00:00 \u002b0000 UTC","dateModified":"2020-11-28 16:00:00 \u002b0000 UTC","url":"https:\/\/fanjingbo.com\/post\/oom-killer\/","keywords":[]}</script><title>对于Linux中oom-killer的简单探究 - Fan Jingbo's Blog</title><meta property="og:title" content="对于Linux中oom-killer的简单探究 - Fan Jingbo's Blog"><meta property="og:type" content="article"><meta property="og:description" content="最近在对Elasticsearch集群进行压力测试的时候发现，当我不停的对集群进行创建索引操作时，集群的master节点总会莫名其妙的挂掉。表现是ES进程退出，并且JVM没有生成相应的dump文件。我陷入了疑惑，后来经过别人指点我才知道原来进程是被Linux中的oom-killer杀掉了。由于之前没有了解过，所以我花了一段时间了解了一下oom-killer的机制，还顺带看了一些Linux源码。
+一、Linux内存分配参数vm.overcommit_memory Linux的内存是先申请，然后再按需分配的，所以有可能一个进程申请了200MB的内存，但是实际只使用了100MB。所以为了最大化内存利用率，Linux支持过度申请，也就是所谓的overcommit。Linux内核通过overcommit_memory这个参数决定对待申请内存的策略，包含三个值，内核文档说明如下：
+0	-	Heuristic overcommit handling. Obvious overcommits of address space are refused. Used for a typical system. It ensures a seriously wild allocation fails while allowing overcommit to reduce swap usage. root is allowed to allocate slightly more memory in this mode. This is the default. 1	-	Always overcommit. Appropriate for some scientific applications. Classic example is code using sparse arrays and just relying on the virtual memory consisting almost entirely of zero pages."><meta name=description content="最近在对Elasticsearch集群进行压力测试的时候发现，当我不停的对集群进行创建索引操作时，集群的master节点总会莫名其妙的挂掉。表现是ES进程退出，并且JVM没有生成相应的dump文件。我陷入了疑惑，后来经过别人指点我才知道原来进程是被Linux中的oom-killer杀掉了。由于之前没有了解过，所以我花了一段时间了解了一下oom-killer的机制，还顺带看了一些Linux源码。
+一、Linux内存分配参数vm.overcommit_memory Linux的内存是先申请，然后再按需分配的，所以有可能一个进程申请了200MB的内存，但是实际只使用了100MB。所以为了最大化内存利用率，Linux支持过度申请，也就是所谓的overcommit。Linux内核通过overcommit_memory这个参数决定对待申请内存的策略，包含三个值，内核文档说明如下：
+0	-	Heuristic overcommit handling. Obvious overcommits of address space are refused. Used for a typical system. It ensures a seriously wild allocation fails while allowing overcommit to reduce swap usage. root is allowed to allocate slightly more memory in this mode. This is the default. 1	-	Always overcommit. Appropriate for some scientific applications. Classic example is code using sparse arrays and just relying on the virtual memory consisting almost entirely of zero pages."><meta property="og:locale" content="en-us"><link rel=stylesheet href=/css/flexboxgrid-6.3.1.min.css><link rel=stylesheet href=/css/github-markdown.css><link rel=stylesheet href=/css/highlight/tomorrow.min.css><link rel=stylesheet href=/css/index.css><link href=/index.xml rel=alternate type=application/rss+xml title="Fan Jingbo's Blog"><link href="https://fonts.googleapis.com/css?family=Arvo|Permanent+Marker|Bree+Serif&display=swap" rel=stylesheet></head><body><article class="post Chinese" id=article><div class=row><div class=col-xs-12><div class=site-header><header><div class="signatures site-title"><a href=/>Fan Jingbo</a></div></header><div class="row end-xs"></div><div class=header-line></div></div><header class=post-header><h1 class=post-title>对于Linux中oom-killer的简单探究</h1><div class="row post-desc"><div class=col-xs-6><time class=post-date datetime="2020-11-28 16:00:00 UTC">28 Nov 2020</time></div><div class=col-xs-6><div class=post-author><a target=_blank href=https://fanjingbo.com>@Fan Jingbo</a></div></div></div></header><div class="post-content markdown-body"><p>最近在对Elasticsearch集群进行压力测试的时候发现，当我不停的对集群进行创建索引操作时，集群的master节点总会莫名其妙的挂掉。表现是ES进程退出，并且JVM没有生成相应的dump文件。我陷入了疑惑，后来经过别人指点我才知道原来进程是被Linux中的oom-killer杀掉了。由于之前没有了解过，所以我花了一段时间了解了一下oom-killer的机制，还顺带看了一些Linux源码。</p><h3 id=一linux内存分配参数vmovercommit_memory>一、Linux内存分配参数vm.overcommit_memory</h3><p>Linux的内存是先申请，然后再按需分配的，所以有可能一个进程申请了200MB的内存，但是实际只使用了100MB。所以为了最大化内存利用率，Linux支持过度申请，也就是所谓的overcommit。Linux内核通过overcommit_memory这个参数决定对待申请内存的策略，包含三个值，<a href=https://www.kernel.org/doc/Documentation/vm/overcommit-accounting>内核文档</a>说明如下：</p><pre><code>0	-	Heuristic overcommit handling. Obvious overcommits of
+        address space are refused. Used for a typical system. It
+        ensures a seriously wild allocation fails while allowing
+        overcommit to reduce swap usage.  root is allowed to 
+        allocate slightly more memory in this mode. This is the 
+        default.
+
+1	-	Always overcommit. Appropriate for some scientific
+        applications. Classic example is code using sparse arrays
+        and just relying on the virtual memory consisting almost
+        entirely of zero pages.
+
+2	-	Don't overcommit. The total address space commit
+        for the system is not permitted to exceed swap + a
+        configurable amount (default is 50%) of physical RAM.
+        Depending on the amount you use, in most situations
+        this means a process will not be killed while accessing
+        pages but will receive errors on memory allocation as
+        appropriate.
+
+        Useful for applications that want to guarantee their
+        memory allocations will be available in the future
+        without having to initialize every page.
+</code></pre><p>大概意思是：当值为0时会使用一种启发式的处理方式，明显超出限度的内存申请会被拒绝；当值为1时总是允许overcommit；当值为2时不允许overcommit，但实际上还是有个计算标准来决定是否拒绝内存申请。</p><p>说实话这些说明看起来很模糊，让人理解不能，但是当我找到相对应的内核源码时，我很轻松地就搞懂了这里面的逻辑，实际上很简单，我会用注释的方式说明。</p><p>代码如下：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c>    <span style=color:#75715e>/*
+</span><span style=color:#75715e>     * Check that a process has enough memory to allocate a new virtual
+</span><span style=color:#75715e>     * mapping. 0 means there is enough memory for the allocation to
+</span><span style=color:#75715e>     * succeed and -ENOMEM implies there is not.
+</span><span style=color:#75715e>     *
+</span><span style=color:#75715e>     * We currently support three overcommit policies, which are set via the
+</span><span style=color:#75715e>     * vm.overcommit_memory sysctl.  See Documentation/vm/overcommit-accounting.rst
+</span><span style=color:#75715e>     *
+</span><span style=color:#75715e>     * Strict overcommit modes added 2002 Feb 26 by Alan Cox.
+</span><span style=color:#75715e>     * Additional code 2002 Jul 20 by Robert Love.
+</span><span style=color:#75715e>     *
+</span><span style=color:#75715e>     * cap_sys_admin is 1 if the process has admin privileges, 0 otherwise.
+</span><span style=color:#75715e>     *
+</span><span style=color:#75715e>     * Note this is a helper function intended to be used by LSMs which
+</span><span style=color:#75715e>     * wish to use this logic.
+</span><span style=color:#75715e>     */</span>
+    <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>__vm_enough_memory</span>(<span style=color:#66d9ef>struct</span> mm_struct <span style=color:#f92672>*</span>mm, <span style=color:#66d9ef>long</span> pages, <span style=color:#66d9ef>int</span> cap_sys_admin)
+    {
+    	<span style=color:#66d9ef>long</span> allowed;
+    
+    	vm_acct_memory(pages); <span style=color:#75715e>// 此处应该是申请内存逻辑
+</span><span style=color:#75715e></span>    
+    	<span style=color:#75715e>/*
+</span><span style=color:#75715e>    	 * Sometimes we want to use more memory than we have
+</span><span style=color:#75715e>    	 */</span>
+    	<span style=color:#66d9ef>if</span> (sysctl_overcommit_memory <span style=color:#f92672>==</span> OVERCOMMIT_ALWAYS) <span style=color:#75715e>// OVERCOMMIT_ALWAYS对应上面的1
+</span><span style=color:#75715e></span>    		<span style=color:#66d9ef>return</span> <span style=color:#ae81ff>0</span>; <span style=color:#75715e>// 当逻辑是OVERCOMMIT_ALWAYS，总是返回0，也就是成功申请
+</span><span style=color:#75715e></span>    
+    	<span style=color:#66d9ef>if</span> (sysctl_overcommit_memory <span style=color:#f92672>==</span> OVERCOMMIT_GUESS) { <span style=color:#75715e>// OVERCOMMIT_GUESS对应上面的0
+</span><span style=color:#75715e></span>    		<span style=color:#66d9ef>if</span> (pages <span style=color:#f92672>&gt;</span> totalram_pages() <span style=color:#f92672>+</span> total_swap_pages)
+    			<span style=color:#66d9ef>goto</span> error; <span style=color:#75715e>// 这里就是上面说的明显超出限度的内存申请，其实就是总内存加上swap内存
+</span><span style=color:#75715e></span>    		<span style=color:#66d9ef>return</span> <span style=color:#ae81ff>0</span>;
+    	}
+    
+    	allowed <span style=color:#f92672>=</span> vm_commit_limit(); <span style=color:#75715e>// 这里实际上通过复杂一些的方式计算出来了一个限额，对应了NEVER的情况
+</span><span style=color:#75715e></span>    	<span style=color:#75715e>/*
+</span><span style=color:#75715e>    	 * Reserve some for root
+</span><span style=color:#75715e>    	 */</span>
+    	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>cap_sys_admin)
+    		allowed <span style=color:#f92672>-=</span> sysctl_admin_reserve_kbytes <span style=color:#f92672>&gt;&gt;</span> (PAGE_SHIFT <span style=color:#f92672>-</span> <span style=color:#ae81ff>10</span>);
+    
+    	<span style=color:#75715e>/*
+</span><span style=color:#75715e>    	 * Don&#39;t let a single process grow so big a user can&#39;t recover
+</span><span style=color:#75715e>    	 */</span>
+    	<span style=color:#66d9ef>if</span> (mm) {
+    		<span style=color:#66d9ef>long</span> reserve <span style=color:#f92672>=</span> sysctl_user_reserve_kbytes <span style=color:#f92672>&gt;&gt;</span> (PAGE_SHIFT <span style=color:#f92672>-</span> <span style=color:#ae81ff>10</span>);
+    
+    		allowed <span style=color:#f92672>-=</span> min_t(<span style=color:#66d9ef>long</span>, mm<span style=color:#f92672>-&gt;</span>total_vm <span style=color:#f92672>/</span> <span style=color:#ae81ff>32</span>, reserve);
+    	}
+    
+    	<span style=color:#66d9ef>if</span> (percpu_counter_read_positive(<span style=color:#f92672>&amp;</span>vm_committed_as) <span style=color:#f92672>&lt;</span> allowed)
+    		<span style=color:#66d9ef>return</span> <span style=color:#ae81ff>0</span>;
+    error:
+    	vm_unacct_memory(pages); <span style=color:#75715e>// 0和2的情况如果超出了相应的限度会到这里来，逻辑应该是释放申请的内存
+</span><span style=color:#75715e></span>    
+    	<span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span>ENOMEM;
+    }
+</code></pre></div><p>实际上能看出来是否触发oom killer跟这个参数根本没有关系，修改这个参数只会影响一个进程能否申请到内存的逻辑。值为1条件最宽松，值为0条件次之，值为2最严格，仅此而已。我之前被网上的一些信息误导了，让我以为这个参数与oom killer的执行逻辑有关，直到我读了一下代码才明白其中缘由。</p><p>那么是什么来决定是否触发oom killer？这就涉及到另一个内核参数了。</p><h3 id=二linux-oom处理逻辑参数vmpanic_on_oom>二、Linux OOM处理逻辑参数vm.panic_on_oom</h3><p>当实际物理内存不足时，会进入以下逻辑进行处理（oom_kill.c）：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c>    <span style=color:#75715e>/**
+</span><span style=color:#75715e>     * out_of_memory - kill the &#34;best&#34; process when we run out of memory
+</span><span style=color:#75715e>     * @oc: pointer to struct oom_control
+</span><span style=color:#75715e>     *
+</span><span style=color:#75715e>     * If we run out of memory, we have the choice between either
+</span><span style=color:#75715e>     * killing a random task (bad), letting the system crash (worse)
+</span><span style=color:#75715e>     * OR try to be smart about which process to kill. Note that we
+</span><span style=color:#75715e>     * don&#39;t have to be perfect here, we just have to be good.
+</span><span style=color:#75715e>     */</span>
+    <span style=color:#66d9ef>bool</span> <span style=color:#a6e22e>out_of_memory</span>(<span style=color:#66d9ef>struct</span> oom_control <span style=color:#f92672>*</span>oc)
+    {
+    	<span style=color:#66d9ef>unsigned</span> <span style=color:#66d9ef>long</span> freed <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+    
+    	<span style=color:#66d9ef>if</span> (oom_killer_disabled)
+    		<span style=color:#66d9ef>return</span> false;
+    
+    	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>is_memcg_oom(oc)) {
+    		blocking_notifier_call_chain(<span style=color:#f92672>&amp;</span>oom_notify_list, <span style=color:#ae81ff>0</span>, <span style=color:#f92672>&amp;</span>freed);
+    		<span style=color:#66d9ef>if</span> (freed <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>)
+    			<span style=color:#75715e>/* Got some memory back in the last second. */</span>
+    			<span style=color:#66d9ef>return</span> true;
+    	}
+    
+    	<span style=color:#75715e>/*
+</span><span style=color:#75715e>    	 * If current has a pending SIGKILL or is exiting, then automatically
+</span><span style=color:#75715e>    	 * select it.  The goal is to allow it to allocate so that it may
+</span><span style=color:#75715e>    	 * quickly exit and free its memory.
+</span><span style=color:#75715e>    	 */</span>
+    	<span style=color:#66d9ef>if</span> (task_will_free_mem(current)) {
+    		mark_oom_victim(current);
+    		wake_oom_reaper(current);
+    		<span style=color:#66d9ef>return</span> true;
+    	}
+    
+    	<span style=color:#75715e>/*
+</span><span style=color:#75715e>    	 * The OOM killer does not compensate for IO-less reclaim.
+</span><span style=color:#75715e>    	 * pagefault_out_of_memory lost its gfp context so we have to
+</span><span style=color:#75715e>    	 * make sure exclude 0 mask - all other users should have at least
+</span><span style=color:#75715e>    	 * ___GFP_DIRECT_RECLAIM to get here. But mem_cgroup_oom() has to
+</span><span style=color:#75715e>    	 * invoke the OOM killer even if it is a GFP_NOFS allocation.
+</span><span style=color:#75715e>    	 */</span>
+    	<span style=color:#66d9ef>if</span> (oc<span style=color:#f92672>-&gt;</span>gfp_mask <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!</span>(oc<span style=color:#f92672>-&gt;</span>gfp_mask <span style=color:#f92672>&amp;</span> __GFP_FS) <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!</span>is_memcg_oom(oc))
+    		<span style=color:#66d9ef>return</span> true;
+    
+    	<span style=color:#75715e>/*
+</span><span style=color:#75715e>    	 * Check if there were limitations on the allocation (only relevant for
+</span><span style=color:#75715e>    	 * NUMA and memcg) that may require different handling.
+</span><span style=color:#75715e>    	 */</span>
+    	oc<span style=color:#f92672>-&gt;</span>constraint <span style=color:#f92672>=</span> constrained_alloc(oc);
+    	<span style=color:#66d9ef>if</span> (oc<span style=color:#f92672>-&gt;</span>constraint <span style=color:#f92672>!=</span> CONSTRAINT_MEMORY_POLICY)
+    		oc<span style=color:#f92672>-&gt;</span>nodemask <span style=color:#f92672>=</span> NULL;
+    	check_panic_on_oom(oc);
+    
+    	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>is_memcg_oom(oc) <span style=color:#f92672>&amp;&amp;</span> sysctl_oom_kill_allocating_task <span style=color:#f92672>&amp;&amp;</span>
+    	    current<span style=color:#f92672>-&gt;</span>mm <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!</span>oom_unkillable_task(current) <span style=color:#f92672>&amp;&amp;</span>
+    	    oom_cpuset_eligible(current, oc) <span style=color:#f92672>&amp;&amp;</span>
+    	    current<span style=color:#f92672>-&gt;</span>signal<span style=color:#f92672>-&gt;</span>oom_score_adj <span style=color:#f92672>!=</span> OOM_SCORE_ADJ_MIN) {
+    		get_task_struct(current);
+    		oc<span style=color:#f92672>-&gt;</span>chosen <span style=color:#f92672>=</span> current;
+    		oom_kill_process(oc, <span style=color:#e6db74>&#34;Out of memory (oom_kill_allocating_task)&#34;</span>);
+    		<span style=color:#66d9ef>return</span> true;
+    	}
+    
+    	select_bad_process(oc);
+    	<span style=color:#75715e>/* Found nothing?!?! */</span>
+    	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>oc<span style=color:#f92672>-&gt;</span>chosen) {
+    		dump_header(oc, NULL);
+    		pr_warn(<span style=color:#e6db74>&#34;Out of memory and no killable processes...</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+    		<span style=color:#75715e>/*
+</span><span style=color:#75715e>    		 * If we got here due to an actual allocation at the
+</span><span style=color:#75715e>    		 * system level, we cannot survive this and will enter
+</span><span style=color:#75715e>    		 * an endless loop in the allocator. Bail out now.
+</span><span style=color:#75715e>    		 */</span>
+    		<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>is_sysrq_oom(oc) <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!</span>is_memcg_oom(oc))
+    			panic(<span style=color:#e6db74>&#34;System is deadlocked on memory</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+    	}
+    	<span style=color:#66d9ef>if</span> (oc<span style=color:#f92672>-&gt;</span>chosen <span style=color:#f92672>&amp;&amp;</span> oc<span style=color:#f92672>-&gt;</span>chosen <span style=color:#f92672>!=</span> (<span style=color:#66d9ef>void</span> <span style=color:#f92672>*</span>)<span style=color:#f92672>-</span><span style=color:#ae81ff>1UL</span>)
+    		oom_kill_process(oc, <span style=color:#f92672>!</span>is_memcg_oom(oc) <span style=color:#f92672>?</span> <span style=color:#e6db74>&#34;Out of memory&#34;</span> <span style=color:#f92672>:</span>
+    				 <span style=color:#e6db74>&#34;Memory cgroup out of memory&#34;</span>);
+    	<span style=color:#66d9ef>return</span> <span style=color:#f92672>!!</span>oc<span style=color:#f92672>-&gt;</span>chosen;
+    }
+</code></pre></div><p>这个方法注释写的很有意思：实际上当物理内存不足要发生时，对于操作系统来说没什么选择，要么随机杀进程(bad)，要么让系统崩溃(worse)，要么通过一种更聪明的方式杀进程释放出内存。在这时没有完美的(perfect)选择，只有好的(good)选择。的确，在一般情况下，杀进程确实要比让系统崩溃更好，这也是一种无奈的办法了。</p><p>当然，操作系统不会帮用户决定这种重要的事情，可以通过修改内核参数vm.panic_on_oom的方式更改逻辑。</p><p>还是看一下<a href=https://www.kernel.org/doc/Documentation/sysctl/vm.txt>内核文档</a>：</p><pre><code>panic_on_oom
+
+This enables or disables panic on out-of-memory feature.
+If this is set to 0, the kernel will kill some rogue process,
+called oom_killer.  Usually, oom_killer can kill rogue processes and
+system will survive.
+
+If this is set to 1, the kernel panics when out-of-memory happens.
+However, if a process limits using nodes by mempolicy/cpusets,
+and those nodes become memory exhaustion status, one process
+may be killed by oom-killer. No panic occurs in this case.
+Because other nodes' memory may be free. This means system total status
+may be not fatal yet.
+
+If this is set to 2, the kernel panics compulsorily even on the
+above-mentioned. Even oom happens under memory cgroup, the whole
+system panics.
+
+The default value is 0.
+</code></pre><p>当值为0时，oom killer是开启状态，值为1时，只是在一些情况下使用oom killer，值为2不使用oom killer，也就是说系统总是会触发kernal panic。</p><p>还是看下源码：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c>    <span style=color:#75715e>/*
+</span><span style=color:#75715e>     * Determines whether the kernel must panic because of the panic_on_oom sysctl.
+</span><span style=color:#75715e>     */</span>
+    <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>check_panic_on_oom</span>(<span style=color:#66d9ef>struct</span> oom_control <span style=color:#f92672>*</span>oc) <span style=color:#75715e>// 这个函数正常返回之后会触发oom killer
+</span><span style=color:#75715e></span>    {
+    	<span style=color:#66d9ef>if</span> (likely(<span style=color:#f92672>!</span>sysctl_panic_on_oom))
+    		<span style=color:#66d9ef>return</span>; <span style=color:#75715e>// 0的时候直接返回，触发oom killer
+</span><span style=color:#75715e></span>    	<span style=color:#66d9ef>if</span> (sysctl_panic_on_oom <span style=color:#f92672>!=</span> <span style=color:#ae81ff>2</span>) {
+    		<span style=color:#75715e>/*
+</span><span style=color:#75715e>    		 * panic_on_oom == 1 only affects CONSTRAINT_NONE, the kernel
+</span><span style=color:#75715e>    		 * does not panic for cpuset, mempolicy, or memcg allocation
+</span><span style=color:#75715e>    		 * failures.
+</span><span style=color:#75715e>    		 */</span>
+    		<span style=color:#66d9ef>if</span> (oc<span style=color:#f92672>-&gt;</span>constraint <span style=color:#f92672>!=</span> CONSTRAINT_NONE)
+    			<span style=color:#66d9ef>return</span>; <span style=color:#75715e>// 1的时候，在一定条件下触发oom killer
+</span><span style=color:#75715e></span>    	}
+    	<span style=color:#75715e>/* Do not panic for oom kills triggered by sysrq */</span>
+    	<span style=color:#66d9ef>if</span> (is_sysrq_oom(oc))
+    		<span style=color:#66d9ef>return</span>;
+    	dump_header(oc, NULL);
+    	panic(<span style=color:#e6db74>&#34;Out of memory: %s panic_on_oom is enabled</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>,
+    		sysctl_panic_on_oom <span style=color:#f92672>==</span> <span style=color:#ae81ff>2</span> <span style=color:#f92672>?</span> <span style=color:#e6db74>&#34;compulsory&#34;</span> <span style=color:#f92672>:</span> <span style=color:#e6db74>&#34;system-wide&#34;</span>); <span style=color:#75715e>// 这里触发了kernel panic
+</span><span style=color:#75715e></span>    }
+</code></pre></div><h3 id=三oom-killer如何决定杀哪个进程>三、oom killer如何决定杀哪个进程</h3><p>继续看源码：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c>    <span style=color:#75715e>/*
+</span><span style=color:#75715e>     * Simple selection loop. We choose the process with the highest number of
+</span><span style=color:#75715e>     * &#39;points&#39;. In case scan was aborted, oc-&gt;chosen is set to -1.
+</span><span style=color:#75715e>     */</span>
+    <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>select_bad_process</span>(<span style=color:#66d9ef>struct</span> oom_control <span style=color:#f92672>*</span>oc)
+    {
+    	oc<span style=color:#f92672>-&gt;</span>chosen_points <span style=color:#f92672>=</span> LONG_MIN;
+    
+    	<span style=color:#66d9ef>if</span> (is_memcg_oom(oc))
+    		mem_cgroup_scan_tasks(oc<span style=color:#f92672>-&gt;</span>memcg, oom_evaluate_task, oc);
+    	<span style=color:#66d9ef>else</span> {
+    		<span style=color:#66d9ef>struct</span> task_struct <span style=color:#f92672>*</span>p;
+    
+    		rcu_read_lock();
+    		for_each_process(p)
+    			<span style=color:#66d9ef>if</span> (oom_evaluate_task(p, oc))
+    				<span style=color:#66d9ef>break</span>; <span style=color:#75715e>// 遍历进程，调用oom_evaluate_task函数，返回非0时跳出，说明选择到了要杀的进程
+</span><span style=color:#75715e></span>    		rcu_read_unlock();
+    }
+    
+    <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> oom_evaluate_task(<span style=color:#66d9ef>struct</span> task_struct <span style=color:#f92672>*</span>task, <span style=color:#66d9ef>void</span> <span style=color:#f92672>*</span>arg)
+    {
+    	<span style=color:#66d9ef>struct</span> oom_control <span style=color:#f92672>*</span>oc <span style=color:#f92672>=</span> arg;
+    	<span style=color:#66d9ef>long</span> points;
+    
+    	<span style=color:#66d9ef>if</span> (oom_unkillable_task(task))
+    		<span style=color:#66d9ef>goto</span> next;
+    
+    	<span style=color:#75715e>/* p may not have freeable memory in nodemask */</span>
+    	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>is_memcg_oom(oc) <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!</span>oom_cpuset_eligible(task, oc))
+    		<span style=color:#66d9ef>goto</span> next;
+    
+    	<span style=color:#75715e>/*
+</span><span style=color:#75715e>    	 * This task already has access to memory reserves and is being killed.
+</span><span style=color:#75715e>    	 * Don&#39;t allow any other task to have access to the reserves unless
+</span><span style=color:#75715e>    	 * the task has MMF_OOM_SKIP because chances that it would release
+</span><span style=color:#75715e>    	 * any memory is quite low.
+</span><span style=color:#75715e>    	 */</span>
+    	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>is_sysrq_oom(oc) <span style=color:#f92672>&amp;&amp;</span> tsk_is_oom_victim(task)) {
+    		<span style=color:#66d9ef>if</span> (test_bit(MMF_OOM_SKIP, <span style=color:#f92672>&amp;</span>task<span style=color:#f92672>-&gt;</span>signal<span style=color:#f92672>-&gt;</span>oom_mm<span style=color:#f92672>-&gt;</span>flags))
+    			<span style=color:#66d9ef>goto</span> next;
+    		<span style=color:#66d9ef>goto</span> abort;
+    	}
+    
+    	<span style=color:#75715e>/*
+</span><span style=color:#75715e>    	 * If task is allocating a lot of memory and has been marked to be
+</span><span style=color:#75715e>    	 * killed first if it triggers an oom, then select it.
+</span><span style=color:#75715e>    	 */</span>
+    	<span style=color:#66d9ef>if</span> (oom_task_origin(task)) {
+    		points <span style=color:#f92672>=</span> LONG_MAX;
+    		<span style=color:#66d9ef>goto</span> select;
+    	}
+    
+    	points <span style=color:#f92672>=</span> oom_badness(task, oc<span style=color:#f92672>-&gt;</span>totalpages); <span style=color:#75715e>// 通过oom_badness算出分数，存一个最大的
+</span><span style=color:#75715e></span>    	<span style=color:#66d9ef>if</span> (points <span style=color:#f92672>==</span> LONG_MIN <span style=color:#f92672>||</span> points <span style=color:#f92672>&lt;</span> oc<span style=color:#f92672>-&gt;</span>chosen_points)
+    		<span style=color:#66d9ef>goto</span> next;
+    
+    select: <span style=color:#75715e>// 有更大的分数进入这个逻辑
+</span><span style=color:#75715e></span>    	<span style=color:#66d9ef>if</span> (oc<span style=color:#f92672>-&gt;</span>chosen)
+    		put_task_struct(oc<span style=color:#f92672>-&gt;</span>chosen);
+    	get_task_struct(task);
+    	oc<span style=color:#f92672>-&gt;</span>chosen <span style=color:#f92672>=</span> task;
+    	oc<span style=color:#f92672>-&gt;</span>chosen_points <span style=color:#f92672>=</span> points;
+    next: <span style=color:#75715e>// 跳过这次循环
+</span><span style=color:#75715e></span>    	<span style=color:#66d9ef>return</span> <span style=color:#ae81ff>0</span>;
+    abort: <span style=color:#75715e>// 跳出逻辑
+</span><span style=color:#75715e></span>    	<span style=color:#66d9ef>if</span> (oc<span style=color:#f92672>-&gt;</span>chosen)
+    		put_task_struct(oc<span style=color:#f92672>-&gt;</span>chosen);
+    	oc<span style=color:#f92672>-&gt;</span>chosen <span style=color:#f92672>=</span> (<span style=color:#66d9ef>void</span> <span style=color:#f92672>*</span>)<span style=color:#f92672>-</span><span style=color:#ae81ff>1UL</span>;
+    	<span style=color:#66d9ef>return</span> <span style=color:#ae81ff>1</span>;
+    }
+    
+    <span style=color:#75715e>/**
+</span><span style=color:#75715e>     * oom_badness - heuristic function to determine which candidate task to kill
+</span><span style=color:#75715e>     * @p: task struct of which task we should calculate
+</span><span style=color:#75715e>     * @totalpages: total present RAM allowed for page allocation
+</span><span style=color:#75715e>     *
+</span><span style=color:#75715e>     * The heuristic for determining which task to kill is made to be as simple and
+</span><span style=color:#75715e>     * predictable as possible.  The goal is to return the highest value for the
+</span><span style=color:#75715e>     * task consuming the most memory to avoid subsequent oom failures.
+</span><span style=color:#75715e>     */</span>
+    <span style=color:#66d9ef>long</span> oom_badness(<span style=color:#66d9ef>struct</span> task_struct <span style=color:#f92672>*</span>p, <span style=color:#66d9ef>unsigned</span> <span style=color:#66d9ef>long</span> totalpages)
+    {
+    	<span style=color:#66d9ef>long</span> points;
+    	<span style=color:#66d9ef>long</span> adj;
+    
+    	<span style=color:#66d9ef>if</span> (oom_unkillable_task(p))
+    		<span style=color:#66d9ef>return</span> LONG_MIN;
+    
+    	p <span style=color:#f92672>=</span> find_lock_task_mm(p);
+    	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>p)
+    		<span style=color:#66d9ef>return</span> LONG_MIN;
+    
+    	<span style=color:#75715e>/*
+</span><span style=color:#75715e>    	 * Do not even consider tasks which are explicitly marked oom
+</span><span style=color:#75715e>    	 * unkillable or have been already oom reaped or the are in
+</span><span style=color:#75715e>    	 * the middle of vfork
+</span><span style=color:#75715e>    	 */</span>
+    	adj <span style=color:#f92672>=</span> (<span style=color:#66d9ef>long</span>)p<span style=color:#f92672>-&gt;</span>signal<span style=color:#f92672>-&gt;</span>oom_score_adj;
+    	<span style=color:#66d9ef>if</span> (adj <span style=color:#f92672>==</span> OOM_SCORE_ADJ_MIN <span style=color:#f92672>||</span>
+    			test_bit(MMF_OOM_SKIP, <span style=color:#f92672>&amp;</span>p<span style=color:#f92672>-&gt;</span>mm<span style=color:#f92672>-&gt;</span>flags) <span style=color:#f92672>||</span>
+    			in_vfork(p)) {
+    		task_unlock(p);
+    		<span style=color:#66d9ef>return</span> LONG_MIN;
+    	}
+    
+    	<span style=color:#75715e>/*
+</span><span style=color:#75715e>    	 * The baseline for the badness score is the proportion of RAM that each
+</span><span style=color:#75715e>    	 * task&#39;s rss, pagetable and swap space use.
+</span><span style=color:#75715e>    	 */</span>
+    	points <span style=color:#f92672>=</span> get_mm_rss(p<span style=color:#f92672>-&gt;</span>mm) <span style=color:#f92672>+</span> get_mm_counter(p<span style=color:#f92672>-&gt;</span>mm, MM_SWAPENTS) <span style=color:#f92672>+</span>
+    		mm_pgtables_bytes(p<span style=color:#f92672>-&gt;</span>mm) <span style=color:#f92672>/</span> PAGE_SIZE;
+    	task_unlock(p);
+    
+    	<span style=color:#75715e>/* Normalize to oom_score_adj units */</span>
+    	adj <span style=color:#f92672>*=</span> totalpages <span style=color:#f92672>/</span> <span style=color:#ae81ff>1000</span>;
+    	points <span style=color:#f92672>+=</span> adj;
+    
+    	<span style=color:#66d9ef>return</span> points;
+    }
+</code></pre></div><p>可以看出来计算了rss, pagetable and swap这三部分的空间占用作为比例计算分数，oom_score_adj作为权重影响分数，具体的数值可以通过/proc/&lt;pid>/oom_score_adj文件来修改。也就是说当这个值保持默认的情况下，oom killer实际杀掉的进程时内存占用最多的那个进程。
+这其实是很符合逻辑的，当oom要发生时，肯定是杀掉内存占用最多的进程是最有效率的。否则可能需要多次触发oom killer才能解决oom的问题。如果要保护一个进程不被oom killer杀掉，其实最好的方法只能是增加内存了，因为即使修改了oom_score_adj参数，当单独这个进程需要的内存就超过总内存大小时，无论怎么触发oom killer都是无济于事的。</p><h3 id=四总结>四、总结</h3><p>这次主要有两点体会：一是把oom killer的逻辑梳理清晰的感觉还是很爽的，在这个过程中我通过读Linux内核源码的方式理解了很多内容。很多时候人都会因为畏难情绪而避免读源码，遇到问题喜欢用查资料的方式解决。实际上对于这类问题，看源码的方式也很有效率，并且能避免很多误解。二是体会到了Linux源码写的很不错，注释丰富，结构清晰，就连我这样对内核基本一窍不通的人也能理解很多内容，以后有机会多读下Linux源码。</p></div><div class="row middle-xs"><div class=col-xs-12></div></div><div class=row><div class=col-xs-12></div></div><div style=height:50px></div><div class=site-footer><div class=site-footer-item><a href=http://beian.miit.gov.cn target=_blank>粤ICP备18020202号-1</a></div><div class=site-footer-item><a href=https://github.com/flyingpot target=_blank>Github</a></div></div></div></div></article><script src=/js/highlight.pack.js></script><script>hljs.initHighlightingOnLoad()</script></body></html>

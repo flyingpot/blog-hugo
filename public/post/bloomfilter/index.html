@@ -1,0 +1,121 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=generator content="Hugo 0.82.0"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=author content="Fan Jingbo"><meta property="og:url" content="https://fanjingbo.com/post/bloomfilter/"><link rel=canonical href=https://fanjingbo.com/post/bloomfilter/><link rel=preload href=/js/highlight.pack.js as=script><link rel=alternate type=application/atom+xml href=https://fanjingbo.comindex.xml title="Fan Jingbo's Blog"><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/fanjingbo.com"},"articleSection":"post","name":"由缓存穿透想到的——HashSet和布隆过滤器","headline":"由缓存穿透想到的——HashSet和布隆过滤器","description":"一、缓存穿透 设想一种高并发场景，后台服务在查询数据库（如Mysql）之前先查缓存（如Redis）。如果缓存失效，大量无法在数据库中查询到结果的请求（如数据库中没有的ID查询）没有在Redis中查到内容，就会“穿透”我们的缓存服务，直接打到数据库上。这就有可能导致数据库因为压力过大而挂掉。\n 这里要注意，缓存穿透与缓存击穿是不同的，击穿主要指大量请求查询某一个key的时候，这个key在缓存中是失效状态。这些查询就会“击穿”缓存。还有一个概念叫缓存雪崩，指的就是很多key都在缓存中失效了（或者干脆缓存服务挂掉了），导致数据库被打挂的情况。\n可以这样理解，从穿透到击穿再到雪崩，是一个严重程度逐步递进的过程。\n 针对缓存穿透的问题，有两个解决方法：一个是缓存空值，也就是将值为null写入缓存；另一个就是加入一个过滤器，这个过滤器的作用是识别key是否在数据库中存在，如果存在则继续进入缓存——数据库查询，如果不存在则直接返回结果。\n这种过滤器方法实际上可以用HashSet来实现。\n二、HashSet的原理 1.基本原理 在Java语言中，HashSet是一个数据结构实现类，实现了Set（集合）接口。这个数据结构主要特点就是无序并且唯一。对于缓存穿透的场景，只需要将数据库中的所有key写入HashSet（add方法），然后就可以通过contains方法查到key是否存在，从而实现这个过滤器。\n2.源码分析 那么HashSet是如何实现add过程的去重和contains方法的呢？这时候就需要看代码了。可以发现HashSet实际上是复用了HashMap的方法（定义了一个空对象PRESENT填充到value中，十分巧妙）：\n private transient HashMap\u0026lt;E,Object\u0026gt; map; \/\/ Dummy value to associate with an Object in the backing Map private static final Object PRESENT = new Object(); \/** * Constructs a new, empty set; the backing \u0026lt;tt\u0026gt;HashMap\u0026lt;\/tt\u0026gt; instance has * default initial capacity (16) and load factor (0.75). *\/ public HashSet() { map = new HashMap\u0026lt;\u0026gt;(); } public boolean add(E e) { return map.","inLanguage":"en-US","author":"Fan Jingbo","creator":"Fan Jingbo","publisher":"Fan Jingbo","accountablePerson":"Fan Jingbo","copyrightHolder":"Fan Jingbo","copyrightYear":"2020","datePublished":"2020-08-26 16:00:00 \u002b0000 UTC","dateModified":"2020-08-26 16:00:00 \u002b0000 UTC","url":"https:\/\/fanjingbo.com\/post\/bloomfilter\/","keywords":[]}</script><title>由缓存穿透想到的——HashSet和布隆过滤器 - Fan Jingbo's Blog</title><meta property="og:title" content="由缓存穿透想到的——HashSet和布隆过滤器 - Fan Jingbo's Blog"><meta property="og:type" content="article"><meta property="og:description" content="一、缓存穿透 设想一种高并发场景，后台服务在查询数据库（如Mysql）之前先查缓存（如Redis）。如果缓存失效，大量无法在数据库中查询到结果的请求（如数据库中没有的ID查询）没有在Redis中查到内容，就会“穿透”我们的缓存服务，直接打到数据库上。这就有可能导致数据库因为压力过大而挂掉。
+ 这里要注意，缓存穿透与缓存击穿是不同的，击穿主要指大量请求查询某一个key的时候，这个key在缓存中是失效状态。这些查询就会“击穿”缓存。还有一个概念叫缓存雪崩，指的就是很多key都在缓存中失效了（或者干脆缓存服务挂掉了），导致数据库被打挂的情况。
+可以这样理解，从穿透到击穿再到雪崩，是一个严重程度逐步递进的过程。
+ 针对缓存穿透的问题，有两个解决方法：一个是缓存空值，也就是将值为null写入缓存；另一个就是加入一个过滤器，这个过滤器的作用是识别key是否在数据库中存在，如果存在则继续进入缓存——数据库查询，如果不存在则直接返回结果。
+这种过滤器方法实际上可以用HashSet来实现。
+二、HashSet的原理 1.基本原理 在Java语言中，HashSet是一个数据结构实现类，实现了Set（集合）接口。这个数据结构主要特点就是无序并且唯一。对于缓存穿透的场景，只需要将数据库中的所有key写入HashSet（add方法），然后就可以通过contains方法查到key是否存在，从而实现这个过滤器。
+2.源码分析 那么HashSet是如何实现add过程的去重和contains方法的呢？这时候就需要看代码了。可以发现HashSet实际上是复用了HashMap的方法（定义了一个空对象PRESENT填充到value中，十分巧妙）：
+ private transient HashMap<E,Object> map; // Dummy value to associate with an Object in the backing Map private static final Object PRESENT = new Object(); /** * Constructs a new, empty set; the backing <tt>HashMap</tt> instance has * default initial capacity (16) and load factor (0.75). */ public HashSet() { map = new HashMap<>(); } public boolean add(E e) { return map."><meta name=description content="一、缓存穿透 设想一种高并发场景，后台服务在查询数据库（如Mysql）之前先查缓存（如Redis）。如果缓存失效，大量无法在数据库中查询到结果的请求（如数据库中没有的ID查询）没有在Redis中查到内容，就会“穿透”我们的缓存服务，直接打到数据库上。这就有可能导致数据库因为压力过大而挂掉。
+ 这里要注意，缓存穿透与缓存击穿是不同的，击穿主要指大量请求查询某一个key的时候，这个key在缓存中是失效状态。这些查询就会“击穿”缓存。还有一个概念叫缓存雪崩，指的就是很多key都在缓存中失效了（或者干脆缓存服务挂掉了），导致数据库被打挂的情况。
+可以这样理解，从穿透到击穿再到雪崩，是一个严重程度逐步递进的过程。
+ 针对缓存穿透的问题，有两个解决方法：一个是缓存空值，也就是将值为null写入缓存；另一个就是加入一个过滤器，这个过滤器的作用是识别key是否在数据库中存在，如果存在则继续进入缓存——数据库查询，如果不存在则直接返回结果。
+这种过滤器方法实际上可以用HashSet来实现。
+二、HashSet的原理 1.基本原理 在Java语言中，HashSet是一个数据结构实现类，实现了Set（集合）接口。这个数据结构主要特点就是无序并且唯一。对于缓存穿透的场景，只需要将数据库中的所有key写入HashSet（add方法），然后就可以通过contains方法查到key是否存在，从而实现这个过滤器。
+2.源码分析 那么HashSet是如何实现add过程的去重和contains方法的呢？这时候就需要看代码了。可以发现HashSet实际上是复用了HashMap的方法（定义了一个空对象PRESENT填充到value中，十分巧妙）：
+ private transient HashMap<E,Object> map; // Dummy value to associate with an Object in the backing Map private static final Object PRESENT = new Object(); /** * Constructs a new, empty set; the backing <tt>HashMap</tt> instance has * default initial capacity (16) and load factor (0.75). */ public HashSet() { map = new HashMap<>(); } public boolean add(E e) { return map."><meta property="og:locale" content="en-us"><link rel=stylesheet href=/css/flexboxgrid-6.3.1.min.css><link rel=stylesheet href=/css/github-markdown.css><link rel=stylesheet href=/css/highlight/tomorrow.min.css><link rel=stylesheet href=/css/index.css><link href=/index.xml rel=alternate type=application/rss+xml title="Fan Jingbo's Blog"><link href="https://fonts.googleapis.com/css?family=Arvo|Permanent+Marker|Bree+Serif&display=swap" rel=stylesheet></head><body><article class="post Chinese" id=article><div class=row><div class=col-xs-12><div class=site-header><header><div class="signatures site-title"><a href=/>Fan Jingbo</a></div></header><div class="row end-xs"></div><div class=header-line></div></div><header class=post-header><h1 class=post-title>由缓存穿透想到的——HashSet和布隆过滤器</h1><div class="row post-desc"><div class=col-xs-6><time class=post-date datetime="2020-08-26 16:00:00 UTC">26 Aug 2020</time></div><div class=col-xs-6><div class=post-author><a target=_blank href=https://fanjingbo.com>@Fan Jingbo</a></div></div></div></header><div class="post-content markdown-body"><h2 id=一缓存穿透>一、缓存穿透</h2><p>设想一种高并发场景，后台服务在查询数据库（如Mysql）之前先查缓存（如Redis）。如果缓存失效，大量无法在数据库中查询到结果的请求（如数据库中没有的ID查询）没有在Redis中查到内容，就会“穿透”我们的缓存服务，直接打到数据库上。这就有可能导致数据库因为压力过大而挂掉。</p><blockquote><p>这里要注意，缓存穿透与缓存击穿是不同的，击穿主要指大量请求查询某一个key的时候，这个key在缓存中是失效状态。这些查询就会“击穿”缓存。还有一个概念叫缓存雪崩，指的就是很多key都在缓存中失效了（或者干脆缓存服务挂掉了），导致数据库被打挂的情况。</p><p>可以这样理解，从穿透到击穿再到雪崩，是一个严重程度逐步递进的过程。</p></blockquote><p>针对缓存穿透的问题，有两个解决方法：一个是缓存空值，也就是将值为null写入缓存；另一个就是加入一个过滤器，这个过滤器的作用是识别key是否在数据库中存在，如果存在则继续进入缓存——数据库查询，如果不存在则直接返回结果。</p><p>这种过滤器方法实际上可以用HashSet来实现。</p><h2 id=二hashset的原理>二、HashSet的原理</h2><h3 id=1基本原理>1.基本原理</h3><p>在Java语言中，HashSet是一个数据结构实现类，实现了Set（集合）接口。这个数据结构主要特点就是无序并且唯一。对于缓存穿透的场景，只需要将数据库中的所有key写入HashSet（add方法），然后就可以通过contains方法查到key是否存在，从而实现这个过滤器。</p><h3 id=2源码分析>2.源码分析</h3><p>那么HashSet是如何实现add过程的去重和contains方法的呢？这时候就需要看代码了。可以发现HashSet实际上是复用了HashMap的方法（定义了一个空对象PRESENT填充到value中，十分巧妙）：</p><pre><code>    private transient HashMap&lt;E,Object&gt; map;
+
+    // Dummy value to associate with an Object in the backing Map
+    private static final Object PRESENT = new Object();
+
+    /**
+     * Constructs a new, empty set; the backing &lt;tt&gt;HashMap&lt;/tt&gt; instance has
+     * default initial capacity (16) and load factor (0.75).
+     */
+    public HashSet() {
+        map = new HashMap&lt;&gt;();
+    }
+    public boolean add(E e) {
+        return map.put(e, PRESENT)==null;
+    }
+    public boolean contains(Object o) {
+        return map.containsKey(o);
+    }
+</code></pre><p>那么就看一下HashMap的put和containsKey方法是如何实现的：</p><pre><code>	public V put(K key, V value) {
+        return putVal(hash(key), key, value, false, true);
+    }
+    
+    static final int hash(Object key) {
+        int h;
+        // 与hashCode()的结果做异或的目的是为了增加低位的扰动，减小碰撞
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);
+    }
+
+    final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
+                   boolean evict) {
+        Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; p; int n, i;
+        if ((tab = table) == null || (n = tab.length) == 0)
+            // 扩容逻辑
+            n = (tab = resize()).length;
+        // (n-1) &amp; hash等于hash % n,这里是找到写入的值落在哪个桶里
+        if ((p = tab[i = (n - 1) &amp; hash]) == null)
+            // 如果桶是空的，直接写入
+            tab[i] = newNode(hash, key, value, null);
+        else {
+            Node&lt;K,V&gt; e; K k;
+            // 第一个节点冲突，退出
+            if (p.hash == hash &amp;&amp;
+                ((k = p.key) == key || (key != null &amp;&amp; key.equals(k))))
+                e = p;
+            // 节点是树节点（当前是红黑树而不是链表），走树的相关逻辑
+            else if (p instanceof TreeNode)
+                e = ((TreeNode&lt;K,V&gt;)p).putTreeVal(this, tab, hash, key, value);
+            // 其他情况（链表，且第一个节点不是）
+            else {
+                // 遍历链表
+                for (int binCount = 0; ; ++binCount) {
+                    // 插入链表最后
+                    if ((e = p.next) == null) {
+                        p.next = newNode(hash, key, value, null);
+                        if (binCount &gt;= TREEIFY_THRESHOLD - 1) // -1 for 1st
+                            // 链表长度超过阈值，转红黑树
+                            treeifyBin(tab, hash);
+                        break;
+                    }
+                    // 在链表中间发现冲突
+                    if (e.hash == hash &amp;&amp;
+                        ((k = e.key) == key || (key != null &amp;&amp; key.equals(k))))
+                        break;
+                    p = e;
+                }
+            }
+            // 找到重复key值，开始替换value逻辑
+            if (e != null) { // existing mapping for key
+                V oldValue = e.value;
+                if (!onlyIfAbsent || oldValue == null)
+                    e.value = value;
+                afterNodeAccess(e);
+                return oldValue;
+            }
+        }
+        ++modCount;
+        if (++size &gt; threshold)
+            resize();
+        afterNodeInsertion(evict);
+        return null;
+    }
+    
+    // constainsKey方法与上面的逻辑类似
+    public boolean containsKey(Object key) {
+        return getNode(hash(key), key) != null;
+    }
+    
+    final Node&lt;K,V&gt; getNode(int hash, Object key) {
+        Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; first, e; int n; K k;
+        if ((tab = table) != null &amp;&amp; (n = tab.length) &gt; 0 &amp;&amp;
+            (first = tab[(n - 1) &amp; hash]) != null) {
+            if (first.hash == hash &amp;&amp; // always check first node
+                ((k = first.key) == key || (key != null &amp;&amp; key.equals(k))))
+                return first;
+            if ((e = first.next) != null) {
+                if (first instanceof TreeNode)
+                    return ((TreeNode&lt;K,V&gt;)first).getTreeNode(hash, key);
+                do {
+                    if (e.hash == hash &amp;&amp;
+                        ((k = e.key) == key || (key != null &amp;&amp; key.equals(k))))
+                        return e;
+                } while ((e = e.next) != null);
+            }
+        }
+        return null;
+    }
+</code></pre><p>可以看到HashMap是数组加链表（红黑树）的结构，首先调用对象的hashCode方法落桶，然后在冲突的情况下进行遍历（在红黑树中查询），用equals方法去重。</p><h3 id=3equals和hashcode>3.equals和hashCode</h3><p>其实通过上面的总结可以看出来，hashCode相同是equals相同的充分不必要条件，也就是说hashCode相同不一定equals相同。这样子设计的目的是通过hashCode这种O(1)复杂度的简单操作预先做一个分桶操作，这时候有碰撞的情况下再进行复杂度较高的equals操作，从而达到减小复杂度的目的。</p><p>这也是为什么如果自己重写一个类的equals方法，一定要重写hashCode方法的原因，因为不重写hashCode方法的话，就会出现equals相同而hashCode不同的情况，用在HashSet或者HashMap中就会出现问题。</p><h3 id=4时间复杂度>4.时间复杂度</h3><p>分桶的时间复杂度是O(1)，但是无论是链表遍历（O(n)）还是红黑树查找(O(logn))的复杂度都是更高的。回到缓存穿透的问题上，我们需要实现一个过滤器来确认一个值是否存在，能否只用O(1)的时间复杂度来实现呢？实际上是可以的，这其实就是布隆过滤器</p><h2 id=三布隆过滤器>三、布隆过滤器</h2><p>布隆过滤器（Bloom Filter）的用处与HashSet类似，都是可以用来检索一个元素是否在一个集合中存在。它的时间和空间复杂度都是很低的。很多设计都是一种trade-off，布隆过滤器也不例外，它的准确度其实不是100%。但是布隆过滤器巧妙就巧妙在了它用了很小的代价实现了很好的时间和空间复杂度。</p><p>基于上面对于HashSet的讨论，其实我们能知道要实现好的时间复杂度剔除掉链表和红黑树的部分就好，只保留O(1)的分桶操作。这种情况下逻辑是能满足过滤器要求的：不发生碰撞（分到一个桶里）的一定不在集合中存在。这样一来我们就可以通过这个过滤器过滤掉很多不在数据库中的查询。而且根据过滤器原理可以知道，碰撞率越低，过滤效果越好。</p><p>那么现在的问题就是如何减少空间复杂度和碰撞率了。布隆过滤器很巧妙的使用了位图和多次hash的方式解决了这两个问题。</p><p>引用一下维基百科的原理解释：</p><blockquote><p>当一个元素被加入集合时，通过K个散列函数将这个元素映射成一个位数组中的K个点，把它们置为1。检索时，我们只要看看这些点是不是都是1就（大约）知道集合中有没有它了：如果这些点有任何一个0，则被检元素一定不在；如果都是1，则被检元素很可能在。</p></blockquote><p>这个解释非常清晰明确，我也不需要过多解释了。</p></div><div class="row middle-xs"><div class=col-xs-12></div></div><div class=row><div class=col-xs-12></div></div><div style=height:50px></div><div class=site-footer><div class=site-footer-item><a href=http://beian.miit.gov.cn target=_blank>粤ICP备18020202号-1</a></div><div class=site-footer-item><a href=https://github.com/flyingpot target=_blank>Github</a></div></div></div></div></article><script src=/js/highlight.pack.js></script><script>hljs.initHighlightingOnLoad()</script></body></html>
