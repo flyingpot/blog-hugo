@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: hugo-cos-deploy
-      uses: flyingpot/hugo-cos-deploy@v0.0.1
+      uses: flyingpot/hugo-cos-deploy@v0.0.2
       with:
         secret_id: ${{ secrets.SecretId }}
         secret_key: ${{ secrets.SecretKey }}
