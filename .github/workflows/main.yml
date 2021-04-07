@@ -7,7 +7,9 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2   
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: Setup Hugo
       uses: peaceiris/actions-hugo@v2
       with:
@@ -26,4 +28,4 @@ jobs:
       run: |
         hugo --minify
         coscmd config -a ${{ secrets.SecretId }} -s ${{ secrets.SecretKey }} -b ${{ secrets.BucketName }} -r ${{ secrets.BucketRegion }} -m 10
-        coscmd upload -r --delete -f public/ /
+        coscmd upload -rs --delete -f public/ /
