@@ -98,11 +98,11 @@ params:
   # profile
   profile:
     enabled: true # Whether to show profile bar
-    avatar: avatar.png
+    avatar: favicon.ico
     gravatar: # Gravatar email address, if you enable Gravatar, your avatar config will be overriden
     author: flyingpot
       #author_title: author title
-      #author_description: Good Good Study, Day Day Up~
+    author_description: There is no spoon.
       #location: Shanghai, China
     follow: https://github.com/flyingpot
     # Social Links
