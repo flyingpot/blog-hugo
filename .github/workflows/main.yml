@@ -6,6 +6,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout master
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: hugo-cos-deploy
       uses: flyingpot/hugo-cos-deploy@v0.0.2
       with:
