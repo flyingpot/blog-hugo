@@ -18,6 +18,7 @@ pages:
 - content/post/ctf-bof-pwnable.kr.md
 - content/post/ctf探秘-一-collision-pwnable-kr.md
 - content/post/default.md
+- content/post/elasticsearch-1.md
 - content/post/elasticsearch.md
 - content/post/hashset.md
 - content/post/linux-oom-killer.md
