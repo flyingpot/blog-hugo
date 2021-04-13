@@ -108,4 +108,25 @@ ES的网络请求分为两类：一个是客户端连接集群节点用的Rest�
 
 ### 四、Rest请求处理流程
 
-接下来一步一步分析ES时如何处理Rest请求的，
+接下来我们一步一步分析ES时如何处理Rest请求的.
+
+首先从入口看起，在transport-netty4插件中通过getHttpTransports方法注册了Netty4HttpServerTransport类：
+
+```java
+    @Override
+    public Map<String, Supplier<HttpServerTransport>> getHttpTransports(Settings settings, ThreadPool threadPool, BigArrays bigArrays,
+                                                                        PageCacheRecycler pageCacheRecycler,
+                                                                        CircuitBreakerService circuitBreakerService,
+                                                                        NamedXContentRegistry xContentRegistry,
+                                                                        NetworkService networkService,
+                                                                        HttpServerTransport.Dispatcher dispatcher,
+                                                                        ClusterSettings clusterSettings) {
+        return Collections.singletonMap(NETTY_HTTP_TRANSPORT_NAME,
+            () -> new Netty4HttpServerTransport(settings, networkService, bigArrays, threadPool, xContentRegistry, dispatcher,
+                clusterSettings, getSharedGroupFactory(settings)));
+    }
+```
+
+这其中做了Netty的初始化工作，然后在pipeline中增加了一个handler，对应类是Netty4HttpRequestHandler，这个类继承了Netty中的抽象类SimpleChannelInboundHandler，只需要实现channelRead0这个抽象方法就能拿到从网络IO中反序列化出来的request对象。
+
+接下来就与Netty无关了，是ES对于请求的处理过程。代码都在抽象类AbstractHttpServerTransport中
