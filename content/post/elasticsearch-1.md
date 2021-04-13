@@ -159,4 +159,29 @@ ES的网络请求分为两类：一个是客户端连接集群节点用的Rest�
     }
 ```
 
-然后在TrieMatchingMode这个枚举类中定义了匹配的规则，每次遍历完后，mode会自增
+然后在TrieMatchingMode这个枚举类中定义了匹配的规则，每次遍历完后，mode会自增，就会使用下一个规则，直到所有规则匹配完毕：
+
+```java
+    enum TrieMatchingMode {
+        /*
+         * Retrieve only explicitly mapped nodes, no wildcards are
+         * matched.
+         */
+        EXPLICIT_NODES_ONLY,
+        /*
+         * Retrieve only explicitly mapped nodes, with wildcards
+         * allowed as root nodes.
+         */
+        WILDCARD_ROOT_NODES_ALLOWED,
+        /*
+         * Retrieve only explicitly mapped nodes, with wildcards
+         * allowed as leaf nodes.
+         */
+        WILDCARD_LEAF_NODES_ALLOWED,
+        /*
+         * Retrieve both explicitly mapped and wildcard nodes.
+         */
+        WILDCARD_NODES_ALLOWED
+    }
+```
+
