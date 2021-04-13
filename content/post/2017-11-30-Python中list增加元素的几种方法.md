@@ -1,4 +1,6 @@
 +++
+categories = []
+tags = ["Python"]
 title = "Python中list增加元素的几种方法"
 date = 2017-11-30T07:51:59+08:00
 url = "/post/python_add_elements_in_list"

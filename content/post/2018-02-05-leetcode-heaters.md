@@ -1,4 +1,6 @@
 +++
+categories = []
+tags = ["LeetCode", "算法"]
 title = "[Leetcode] Heaters"
 date = 2018-02-05T01:44:15+08:00
 url = "/post/leetcode_heaters"

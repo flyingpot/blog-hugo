@@ -1,4 +1,6 @@
 +++
+categories = []
+tags = ["算法"]
 title = "Boyer-Moore Majority Vote算法及相关算法题"
 date =  2017-11-24T04:35:46.000+00:00
 url = "/post/boyer_moore_majority_vote"

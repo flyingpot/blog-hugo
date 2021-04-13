@@ -1,4 +1,6 @@
 +++
+categories = []
+tags = ["CTF"]
 date = 2020-08-15T16:00:00Z
 title = "CTF从零单排（二）—— bof (pwnable.kr)"
 url = "/post/ctf2"

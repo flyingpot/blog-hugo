@@ -1,4 +1,6 @@
 +++
+categories = []
+tags = ["Java"]
 date = 2020-11-07T16:00:00Z
 title = "Java的匿名类、匿名函数与方法引用"
 url = "/post/java-anonymous-class-lambda-method-reference"

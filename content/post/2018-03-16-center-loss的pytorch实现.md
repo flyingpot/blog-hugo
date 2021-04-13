@@ -1,4 +1,6 @@
 +++
+categories = []
+tags = ["Python", "AI"]
 title = "Center Loss的Pytorch实现"
 date = 2018-03-16T08:07:05+08:00
 url = "/post/center_loss_pytorch/"

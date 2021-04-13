@@ -1,12 +1,10 @@
 <div class="widget">
     <h3 class="widget-title"> {{ T "widget_tags" }}</h3>
     <div id="tag-cloud-list" class="widget-body">
-            {{ range $name, $taxonomy := $.Site.Taxonomies.tags }}
-            {{ with $.Site.GetPage (printf "/tags/%s" $name) }}
-            <a href="{{ .Permalink }}" class="tag-list-link" rel="{{ $taxonomy.Count}}">{{ $name }}<span
-               class="tag-list-count">{{ $taxonomy.Count}}</span></a>
-            {{ end }}
-            {{- end }}
+        {{ range .Site.Taxonomies.tags }}
+        <a href="{{ .Page.Permalink }}" class="tag-list-link" rel="{{ .Count }}">{{ .Page.Title }}<span
+               class="tag-list-count">{{ .Count }}</span></a>
+        {{ end }}
     </div>
 <script>
 document.onreadystatechange = () => {
