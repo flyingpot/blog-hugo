@@ -1,10 +1,8 @@
----
-title: Boyer-Moore Majority Vote算法及相关算法题
-author: flyingpot
-date: 2017-11-24T04:35:46.000+00:00
-url: "/post/boyer_moore_majority_vote"
-
----
++++
+title = "Boyer-Moore Majority Vote算法及相关算法题"
+date =  2017-11-24T04:35:46.000+00:00
+url = "/post/boyer_moore_majority_vote"
++++
 ## 一、算法简介
 
 Boyer-Moore Majority Vote算法（以下简称BMMV算法）是用来在一系列元素中查找主要元素的算法，具有O(n)的时间复杂度和O(1)的空间复杂度。该算法在1981年由Robert S. Boyer和J Strother Moore提出。

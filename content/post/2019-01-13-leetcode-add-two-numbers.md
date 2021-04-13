@@ -1,10 +1,8 @@
----
-title: "[Leetcode] Add Two Numbers"
-author: flyingpot
-type: post
-date: 2019-01-13T14:39:57+08:00
-url: /post/leetcode_add_two_numbers
----
++++
+title = "[Leetcode] Add Two Numbers"
+date =  2019-01-13T14:39:57+08:00
+url = "/post/leetcode_add_two_numbers"
++++
 ## 一、题目描述
 
 [链接][1]

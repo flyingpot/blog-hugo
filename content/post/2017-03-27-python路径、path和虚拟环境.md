@@ -1,9 +1,8 @@
----
-title: Python、$PATH和虚拟环境
-type: post
-date: 2017-03-27T03:26:57+08:00
-url: /post/python_path
----
++++
+title = "Python、$PATH和虚拟环境"
+date = 2017-03-27T03:26:57+08:00
+url = "/post/python_path"
++++
 ![import\_sys\_carbon][image-1]
 ## 一
 

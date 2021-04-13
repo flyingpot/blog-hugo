@@ -1,10 +1,8 @@
----
-title: Center Loss的Pytorch实现
-author: flyingpot
-type: post
-date: 2018-03-16T08:07:05+08:00
-url: /post/center_loss_pytorch/
----
++++
+title = "Center Loss的Pytorch实现"
+date = 2018-03-16T08:07:05+08:00
+url = "/post/center_loss_pytorch/"
++++
 Center Loss是2016年ECCV的一篇人脸识别[文章][1]中加入的新损失函数。原作者是使用Caffe实现的，有很多人实现了各种版本的Center Loss。但是我发现github上唯一的Pytorch版本并没有完全按照作者的方法来实现，我就打算修改一下。以下的思考都是在修改代码的过程中进行的
 
 ## 一、Center Loss的原理

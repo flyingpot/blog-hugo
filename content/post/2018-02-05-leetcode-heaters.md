@@ -1,10 +1,8 @@
----
-title: '[Leetcode] Heaters'
-author: flyingpot
-type: post
-date: 2018-02-05T01:44:15+08:00
-url: /post/leetcode_heaters
----
++++
+title = "[Leetcode] Heaters"
+date = 2018-02-05T01:44:15+08:00
+url = "/post/leetcode_heaters"
++++
 ## 一、题目描述
 
 [链接][1]

@@ -1,10 +1,8 @@
----
-title: Python中list增加元素的几种方法
-author: flyingpot
-type: post
-date: 2017-11-30T07:51:59+08:00
-url: /post/python_add_elements_in_list
----
++++
+title = "Python中list增加元素的几种方法"
+date = 2017-11-30T07:51:59+08:00
+url = "/post/python_add_elements_in_list"
++++
 ## 一
 
 我一般会用append方法来把元素增加到list中.但今天我看到一种新方法：
