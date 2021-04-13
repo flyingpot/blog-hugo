@@ -1,5 +1,5 @@
 +++
-categories = ["Java"]
+categories = []
 category = ["Java"]
 date = 2020-08-26T16:00:00Z
 tag = ["Java", "缓存"]
