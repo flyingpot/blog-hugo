@@ -1,5 +1,7 @@
 +++
+categories = []
 date = 2019-04-05T03:00:00Z
+tags = ["CI", "静态博客", "Hugo"]
 title = "travis-ci自动部署博客到腾讯云COS"
 url = "/post/travis-ci_to_cos"
 
