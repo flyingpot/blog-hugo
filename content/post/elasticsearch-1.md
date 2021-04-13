@@ -19,7 +19,7 @@ Elasticsearch的模块化做的很不错，不同功能用不同的service或者
 
 ### 三、网络模块初始化
 
-ES的网络请求分为两类：一个是客户端连接集群节点用的Rest请求，走HTTP协议，另一个是集群节点之间的Transport请求，走TCP协议。接下来看代码，实际上ES启动时的初始化会复杂一些，这里就略过一些细节，直接从ES通信模块类NetworkModule看起：
+ES的网络请求分为两类：一个是客户端连接集群节点用的Rest请求，走HTTP协议，另一个是集群节点之间的Transport请求，走TCP协议。接下来看代码，直接从ES通信模块类NetworkModule看起：
 
 ```java
 
@@ -88,7 +88,7 @@ ES的网络请求分为两类：一个是客户端连接集群节点用的Rest�
 
 分别对应了Rest和Transport的handler实现。
 
-实际上ES默认的网络实现在modules文件夹下的transport-netty4插件里面。为了可插拔性ES做了很巧妙的设计，以Rest请求的handler为例，在实际要初始化handler时会读取http.type这个配置，如果没有设置，就会取http.type.default这个配置，而这个配置，就已经写死在了transport-netty4插件里面。所以，默认情况下，ES就会使用transport-netty4里面的网络模块。而如果你想定制自己的网络模块，只需要写一个类似transport-netty4的插件，然后指定http.type这个配置就好。
+在节点初始化时，会通过下面这个方法获取Rest接口的handler（Transport接口同理），依次读取http.type和http.default.type这两个配置。而ES默认的网络实现是通过transport-netty4插件实现的，在这个插件中，会设置http.default.type配置。当用户没有自制自己的网络模块时，就会使用默认的netty实现。如果用户需要自定义时，只需要在插件中设置自己的网络模块名字，然后修改ES的http.type配置就好。
 
 ```java
        public Supplier<HttpServerTransport> getHttpServerTransportSupplier() {
