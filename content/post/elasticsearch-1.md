@@ -255,4 +255,8 @@ public class RestCatAction extends BaseRestHandler {
     }
 ```
 
-到这里整个Rest请求的处理流程就梳理完了：从节点启动开始，Netty接受到用户发送的Rest请求，解析并包装成对象，做HTTP相关校验，根据HTTP方法和URL匹配RestAction，action处理请求并返回。
+
+### 五、总结
+
+本文介绍了ES的通信模块，并梳理了整个Rest请求的处理流程：从节点启动开始，Netty接受到用户发送的Rest请求，解析并包装成对象，做HTTP相关校验，根据HTTP方法和URL匹配RestAction，action处理请求并返回。
+文章的第二部分会梳理Transport请求的处理，敬请期待。
