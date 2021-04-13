@@ -254,3 +254,5 @@ public class RestCatAction extends BaseRestHandler {
         action.accept(channel);
     }
 ```
+
+到这里整个Rest请求的处理流程就梳理完了：从节点启动开始，Netty接受到用户发送的Rest请求，解析并包装成对象，做HTTP相关校验，根据HTTP方法和URL匹配RestAction，action处理请求并返回。
