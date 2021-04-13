@@ -1,5 +1,9 @@
 +++
+categories = ["Java"]
+category = ["Java"]
 date = 2020-08-26T16:00:00Z
+tag = ["Java", "缓存"]
+tags = ["Java", "缓存"]
 title = "由缓存穿透想到的——HashSet和布隆过滤器"
 url = "/post/bloomfilter"
 

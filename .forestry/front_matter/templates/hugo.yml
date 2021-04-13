@@ -14,14 +14,14 @@ fields:
 - type: text
   name: url
   label: Url
-- name: tag
+- name: tags
   type: tag_list
   default: []
-  label: tag
-- name: category
+  label: tags
+- name: categories
   type: tag_list
   default: []
-  label: category
+  label: categories
 pages:
 - content/post/ctf-bof-pwnable.kr.md
 - content/post/ctf探秘-一-collision-pwnable-kr.md
