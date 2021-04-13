@@ -28,6 +28,7 @@ pages:
 - content/post/default.md
 - content/post/elasticsearch-1.md
 - content/post/elasticsearch-2.md
+- content/post/elasticsearch-rescore.md
 - content/post/elasticsearch.md
 - content/post/hashset.md
 - content/post/linux-oom-killer.md
