@@ -127,6 +127,6 @@ ES的网络请求分为两类：一个是客户端连接集群节点用的Rest�
     }
 ```
 
-这其中做了Netty的初始化工作，然后在pipeline中增加了一个handler，对应类是Netty4HttpRequestHandler，这个类继承了Netty中的抽象类SimpleChannelInboundHandler，只需要实现channelRead0这个抽象方法就能拿到从网络IO中反序列化出来的request对象。
+这其中做了Netty的初始化工作，然后在pipeline中增加了一个handler，对应类是Netty4HttpRequestHandler，这个类继承了Netty中的抽象类SimpleChannelInboundHandler，只需要实现channelRead0这个抽象方法就能拿到从网络IO中反序列化出来的HttpRequest对象。
 
-接下来就与Netty无关了，是ES对于请求的处理过程。代码都在抽象类AbstractHttpServerTransport中
+接下来就与Netty无关了，是ES对于请求的处理过程。在抽象类AbstractHttpServerTransport中做了request和channel的进一步包装，然后将请求分发给RestController
