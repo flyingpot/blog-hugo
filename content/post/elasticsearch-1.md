@@ -185,3 +185,42 @@ ES的网络请求分为两类：一个是客户端连接集群节点用的Rest�
     }
 ```
 
+其中每个URL都与具体的RestAction对应，当匹配上时，就会将请求分发给实际的action来处理。参考一下最简单的RestCatAction：
+
+```java
+public class RestCatAction extends BaseRestHandler {
+
+    private static final String CAT = "=^.^=";
+    private static final String CAT_NL = CAT + "\n";
+    private final String HELP;
+
+    public RestCatAction(List<AbstractCatAction> catActions) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(CAT_NL);
+        for (AbstractCatAction catAction : catActions) {
+            catAction.documentation(sb);
+        }
+        HELP = sb.toString();
+    }
+
+    @Override
+    public List<Route> routes() {
+        return List.of(new Route(GET, "/_cat"));
+    }
+
+    @Override
+    public String getName() {
+        return "cat_action";
+    }
+
+    @Override
+    public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
+        return channel -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, HELP));
+    }
+
+}
+```
+
+这个类实现了三个方法：
+1. getName只用在_nodes/usage接口中，只要返回一个名字就好
+2. r
