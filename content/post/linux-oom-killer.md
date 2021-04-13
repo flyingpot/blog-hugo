@@ -1,5 +1,7 @@
 +++
+categories = ["Linux源码"]
 date = 2020-11-28T16:00:00Z
+tags = ["Linux", "oom-killer"]
 title = "对于Linux中oom-killer的简单探究"
 url = "/post/oom-killer"
 
