@@ -129,4 +129,34 @@ ES的网络请求分为两类：一个是客户端连接集群节点用的Rest�
 
 这其中做了Netty的初始化工作，然后在pipeline中增加了一个handler，对应类是Netty4HttpRequestHandler，这个类继承了Netty中的抽象类SimpleChannelInboundHandler，只需要实现channelRead0这个抽象方法就能拿到从网络IO中反序列化出来的HttpRequest对象。
 
-接下来就与Netty无关了，是ES对于请求的处理过程。在抽象类AbstractHttpServerTransport中做了request和channel的进一步包装，然后将请求分发给RestController，在这个类中做了实际的HTTP请求header校验和最重要的部分——URL匹配。URL匹配使用了前赘述算法，
+接下来就与Netty无关了，是ES对于请求的处理过程。在抽象类AbstractHttpServerTransport中做了request和channel的进一步包装，然后将请求分发给RestController，在这个类中做了实际的HTTP请求header校验和最重要的部分——URL匹配。URL匹配使用了前缀树算法，查找方法如下：
+
+```java
+    /**
+     * Returns an iterator of the objects stored in the {@code PathTrie}, using
+     * all possible {@code TrieMatchingMode} modes. The {@code paramSupplier}
+     * is called between each invocation of {@code next()} to supply a new map
+     * of parameters.
+     */
+    public Iterator<T> retrieveAll(String path, Supplier<Map<String, String>> paramSupplier) {
+        return new Iterator<>() {
+
+            private int mode;
+
+            @Override
+            public boolean hasNext() {
+                return mode < TrieMatchingMode.values().length;
+            }
+
+            @Override
+            public T next() {
+                if (hasNext() == false) {
+                    throw new NoSuchElementException("called next() without validating hasNext()! no more modes available");
+                }
+                return retrieve(path, paramSupplier.get(), TrieMatchingMode.values()[mode++]);
+            }
+        };
+    }
+```
+
+然后在TrieMatchingMode这个枚举类中定义了匹配的规则，每次遍历完后，mode会自增
