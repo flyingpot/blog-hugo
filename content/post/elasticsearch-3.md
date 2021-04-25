@@ -1,7 +1,6 @@
 +++
 categories = []
 date = 2021-04-18T16:00:00Z
-draft = true
 tags = ["Elasticsearch", "Java"]
 title = "Elasticsearch源码解析——线程池（一）"
 url = "/post/elasticsearch-threadpool1"
@@ -69,27 +68,92 @@ url = "/post/elasticsearch-threadpool1"
 ```
 
 其中的corePoolSize、maximumPoolSize和workQueue上面介绍过了。其余几个参数含义如下：
-- keepAliveTime：当当前线程数大于核心线程数是，空闲线程等待新任务的时间，超过这个时间就会销毁该空闲线程
-- unit：keepAliveTime的单位
-- threadFactory：线程池创建线程的工厂类，可以自定义线程的名字
-- handler：线程任务的拒绝handler，只需要重写RejectedExecutionHandler接口的rejectedExecution类就可以自定义线程被拒绝后的逻辑
+
+* keepAliveTime：当当前线程数大于核心线程数是，空闲线程等待新任务的时间，超过这个时间就会销毁该空闲线程
+* unit：keepAliveTime的单位
+* threadFactory：线程池创建线程的工厂类，可以自定义线程的名字
+* handler：线程任务的拒绝handler，只需要重写RejectedExecutionHandler接口的rejectedExecution类就可以自定义线程被拒绝后的逻辑
 
 ### 三、ES线程池实现
 
-ES的线程池实现类是ThreadPool，其中把不同的任务用不同的线程池分开。这样的好处一是隔离线程资源，避免当一种任务繁忙时影响到另一种任务的运行；二是可以为不同类型的任务分配不同类型的线程池，提高处理效率。
+ES的线程池类是ThreadPool，其中把不同的任务用不同的线程池分开。这样的好处一是隔离线程资源，避免当一种任务繁忙时影响到另一种任务的运行；二是可以为不同类型的任务分配不同类型的线程池，提高处理效率。
 
-ES封装了一个SizeBlockingQueue类，有两个目的：
+ES预定义好了三种线程池：
 
-* 实现了一个有界的LinkedTransferQueue，主要是重写了offer方法：
+1. newSinglePrioritizing：固定单线程的线程池，只在MasterService中用于更新集群元数据，其中的任务队列使用了优先级队列PriorityBlockingQueue。队列中存入的内容TieBreakingPrioritizedRunnable包含优先级priority和插入顺序insertionOrder，当线程从队列中拿任务时会调用队列的poll方法，队列会返回优先级最高且插入最早的任务：
+
+```java
+        @Override
+        public int compareTo(PrioritizedRunnable pr) {
+            int res = super.compareTo(pr); // 父类的调用为priority.compareTo(pr.priority)，先比较优先级
+            if (res != 0 || !(pr instanceof TieBreakingPrioritizedRunnable)) {
+                return res;
+            }
+            return insertionOrder < ((TieBreakingPrioritizedRunnable) pr).insertionOrder ? -1 : 1;
+        }
+```
+2. newScaling：线程可扩容的线程池，类似Java默认线程池，设定corePoolSize和maximumPoolSize。但是具体逻辑与默认线程池差别很大，首先是队列上，继承了一个性能很好的无界队列，重写了任务写入队列的offer方法，主要逻辑如下：
+
+```java
+        // check if there might be spare capacity in the thread
+        // pool executor
+        int left = executor.getMaximumPoolSize() - executor.getCorePoolSize();
+        if (left > 0) {
+            // reject queuing the task to force the thread pool
+            // executor to add a worker if it can; combined
+            // with ForceQueuePolicy, this causes the thread
+            // pool to always scale up to max pool size and we
+            // only queue when there is no spare capacity
+            return false;
+        } else {
+            return super.offer(e);
+        }
+```
+
+由上文可以知道，如果队列写入失败，并且当前线程数小于最大线程数时，会增加线程并执行传入的任务。这里的逻辑实际上将写入队列和增加线程的顺序颠倒过来了，传入一个新任务时，如果线程没有到最大线程，直接增加线程，直到线程达到最大线程，任务再写入队列。
+
+另一个不同点是拒绝策略，使用newScaling线程池的任务都是系统层级的，如GENERIC，MANAGEMENT，FLUSH等，因此逻辑上是不会将人物拒绝的，所以用的拒绝策略实际上将任务重新放进队列中：
+
+```java
+    static class ForceQueuePolicy implements XRejectedExecutionHandler {
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            try {
+                // force queue policy should only be used with a scaling queue
+                assert executor.getQueue() instanceof ExecutorScalingQueue;
+                executor.getQueue().put(r);
+            } catch (final InterruptedException e) {
+                // a scaling queue never blocks so a put to it can never be interrupted
+                throw new AssertionError(e);
+            }
+        }
+        @Override
+        public long rejected() {
+            return 0;
+        }
+    }
+```
+
+3. newFixed：线程数固定的线程池，corePoolSize和maximumPoolSize值相同，因此线程池正常执行时线程数时固定的。队列有两种情况：
+
+```java
+        BlockingQueue<Runnable> queue;
+        if (queueCapacity < 0) {
+            queue = ConcurrentCollections.newBlockingQueue(); // 具体是LinkedTransferQueue
+        } else {
+            queue = new SizeBlockingQueue<>(ConcurrentCollections.<Runnable>newBlockingQueue(), queueCapacity);
+        }
+```
+当queueCapacity小于0时，队列是LinkedTransferQueue，为无界队列。实际上当前ES只有FORCE_MERGE的线程池是这种情况。感觉其实可以把FORCE_MERGE线程池换成newScaling类型。
+当queueCapacity大于0时，队列是SizeBlockingQueue，实际上是一个封装了的LinkedTransferQueue，为其加上了容量，参考offer方法：
 
 ```java
     @Override
     public boolean offer(E e) {
         while (true) {
             final int current = size.get();
-            // 当前队列size大于队列的容量时，拒绝任务（此时已经到了最大线程数）
             if (current >= capacity()) {
-                return false;
+                return false; // 当队列容量超过限制时，拒绝写入队列
             }
             if (size.compareAndSet(current, 1 + current)) {
                 break;
@@ -103,26 +167,11 @@ ES封装了一个SizeBlockingQueue类，有两个目的：
     }
 ```
 
-* 为一些关键操作增加forcePut方法，实际上就是讲任务强行放入队列，避免关键的任务被拒绝后不会执行：
+所以这种情况下拒绝逻辑就不一样了：
 
 ```java
-    /**
-     * Forces adding an element to the queue, without doing size checks.
-     */
-    public void forcePut(E e) throws InterruptedException {
-        size.incrementAndGet();
-        try {
-            queue.put(e);
-        } catch (InterruptedException ie) {
-            size.decrementAndGet();
-            throw ie;
-        }
-    }
-```
-
-拒绝的逻辑:
-
-```java
+public class EsAbortPolicy implements XRejectedExecutionHandler {
+    private final CounterMetric rejected = new CounterMetric();
     @Override
     public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
         if (r instanceof AbstractRunnable) {
@@ -132,7 +181,7 @@ ES封装了一个SizeBlockingQueue类，有两个目的：
                     throw new IllegalStateException("forced execution, but expected a size queue");
                 }
                 try {
-                    ((SizeBlockingQueue) queue).forcePut(r);
+                    ((SizeBlockingQueue) queue).forcePut(r); // 当任务的isForceExecution方法返回true时，强行写入队列
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new IllegalStateException("forced execution, but got interrupted", e);
@@ -143,7 +192,16 @@ ES封装了一个SizeBlockingQueue类，有两个目的：
         rejected.inc();
         throw new EsRejectedExecutionException("rejected execution of " + r + " on " + executor, executor.isShutdown());
     }
+    @Override
+    public long rejected() {
+        return rejected.count();
+    }
+}
 ```
+
+### 四、总结
+
+ES的线程池初始化逻辑就介绍完了，基本上是在ThreadPoolExecutor的基础上进行拓展的，下一篇文章会探讨ES中线程池的上下文ThreadContext。
 
 参考链接：
 
