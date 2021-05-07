@@ -28,9 +28,7 @@
       {{- partial "post/copyright.html" . }}
     </div>
   </article>
-  {{- if (.Site.Params.comment.type) }}
   {{- partial "post/comment.html" . }}
-  {{- end }}
 </div>
 {{- partial "post/nav.html" . }}
 {{- partial "post/donate.html" . }}
