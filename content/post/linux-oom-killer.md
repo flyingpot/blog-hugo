@@ -8,9 +8,21 @@ url = "/post/oom-killer"
 +++
 最近在对Elasticsearch集群进行压力测试的时候发现，当我不停的对集群进行创建索引操作时，集群的master节点总会莫名其妙的挂掉。表现是ES进程退出，并且JVM没有生成相应的dump文件。我陷入了疑惑，后来经过别人指点我才知道原来进程是被Linux中的oom-killer杀掉了。由于之前没有了解过，所以我花了一段时间了解了一下oom-killer的机制，还顺带看了一些Linux源码。
 
-### 一、Linux内存分配参数vm.overcommit_memory
+### 一、虚拟内存与写时复制（Copy-On-Write）
 
-Linux的内存是先申请，然后再按需分配的，所以有可能一个进程申请了200MB的内存，但是实际只使用了100MB。所以为了最大化内存利用率，Linux支持过度申请，也就是所谓的overcommit。Linux内核通过overcommit_memory这个参数决定对待申请内存的策略，包含三个值，[内核文档](https://www.kernel.org/doc/Documentation/vm/overcommit-accounting)说明如下：
+虚拟内存（Virtual Memory）是一种计算机内存管理技术，用来作为程序与物理内存的桥梁。页（Page）是虚拟内存的最小单位，页表（Page Table）储存着虚拟内存到物理内存的映射。有了虚拟内存，程序就只需要感知抽象出来的一整块虚拟内存，而具体在读写时要使用哪一块物理内存则不需要程序关心。并且通常情况下虚拟内存对应的物理内存都是分散分布的。
+
+基于虚拟内存，程序在申请内存时可以实现仅申请虚拟内存，并且直到写入时才申请物理内存。这里使用了写时复制的技术，直接引用Wiki的原文：
+
+> The copy-on-write technique can be extended to support efficient [memory allocation](https://en.wikipedia.org/wiki/Memory_allocation "Linux kernel") by having a page of [physical memory](https://en.wikipedia.org/wiki/Physical_memory "Physical memory") filled with zeros. When the memory is allocated, all the pages returned refer to the page of zeros and are all marked copy-on-write. This way, physical memory is not allocated for the process until data is written, allowing processes to reserve more virtual memory than physical memory and use memory sparsely, at the risk of running out of virtual address space. The combined algorithm is similar to [demand paging](https://en.wikipedia.org/wiki/Demand_paging).[\[3\]](https://en.wikipedia.org/wiki/Copy-on-write#cite_note-Linux-3)
+
+也就是说，申请内存（如malloc）时，只申请虚拟内存，并且仅仅申请一个全是0的物理页，所有虚拟页都指向这一个物理页，并且虚拟页都被标记成Copy-On-Write。仅仅在写入这段内存时才会分配实际的物理内存。
+
+这里实际也解答了这个[链接](http://fallincode.com/blog/2020/01/malloc%E6%9C%80%E5%A4%9A%E8%83%BD%E5%88%86%E9%85%8D%E5%A4%9A%E5%B0%91%E5%86%85%E5%AD%98/)里面关于分配虚拟内存时物理内存会多占用一个页的问题。
+
+### 二、内存分配参数vm.overcommit_memory
+
+为了最大化内存利用率，Linux支持过度申请，也就是所谓的overcommit。Linux内核通过overcommit_memory这个参数决定对待申请内存的策略，包含三个值，[内核文档](https://www.kernel.org/doc/Documentation/vm/overcommit-accounting)说明如下：
 
     0	-	Heuristic overcommit handling. Obvious overcommits of
     		address space are refused. Used for a typical system. It
@@ -377,7 +389,7 @@ Linux的内存是先申请，然后再按需分配的，所以有可能一个进
     }
 ```
 
-可以看出来计算了rss, pagetable and swap这三部分的空间占用作为比例计算分数，oom_score_adj作为权重影响分数，具体的数值可以通过/proc/\<pid>/oom_score_adj文件来修改。也就是说当这个值保持默认的情况下，oom killer实际杀掉的进程时内存占用最多的那个进程。
+可以看出来计算了rss, pagetable and swap这三部分的空间占用作为比例计算分数，oom_score_adj作为权重影响分数，具体的数值可以通过/proc/<pid>/oom_score_adj文件来修改。也就是说当这个值保持默认的情况下，oom killer实际杀掉的进程时内存占用最多的那个进程。
 这其实是很符合逻辑的，当oom要发生时，肯定是杀掉内存占用最多的进程是最有效率的。否则可能需要多次触发oom killer才能解决oom的问题。如果要保护一个进程不被oom killer杀掉，其实最好的方法只能是增加内存了，因为即使修改了oom_score_adj参数，当单独这个进程需要的内存就超过总内存大小时，无论怎么触发oom killer都是无济于事的。
 
 ### 四、总结
