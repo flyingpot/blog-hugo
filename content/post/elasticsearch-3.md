@@ -14,6 +14,8 @@ url = "/post/elasticsearch-threadpool1"
 
 首先先简单介绍一下线程池的任务调度机制，有以下几个重要参数：当前线程数current，核心线程数core，最大线程数max，存储等待任务的队列queue，任务调度可以用以下流程图表示：
 
+![](/images/31bad766983e212431077ca8da92762050214.png)
+
 可以参考一下Java线程池类ThreadPoolExecutor
 
 ```java
@@ -92,7 +94,8 @@ ES预定义好了三种线程池：
             return insertionOrder < ((TieBreakingPrioritizedRunnable) pr).insertionOrder ? -1 : 1;
         }
 ```
-2. newScaling：线程可扩容的线程池，类似Java默认线程池，设定corePoolSize和maximumPoolSize。但是具体逻辑与默认线程池差别很大，首先是队列上，继承了一个性能很好的无界队列，重写了任务写入队列的offer方法，主要逻辑如下：
+
+1. newScaling：线程可扩容的线程池，类似Java默认线程池，设定corePoolSize和maximumPoolSize。但是具体逻辑与默认线程池差别很大，首先是队列上，继承了一个性能很好的无界队列，重写了任务写入队列的offer方法，主要逻辑如下：
 
 ```java
         // check if there might be spare capacity in the thread
@@ -134,7 +137,7 @@ ES预定义好了三种线程池：
     }
 ```
 
-3. newFixed：线程数固定的线程池，corePoolSize和maximumPoolSize值相同，因此线程池正常执行时线程数时固定的。队列有两种情况：
+1. newFixed：线程数固定的线程池，corePoolSize和maximumPoolSize值相同，因此线程池正常执行时线程数时固定的。队列有两种情况：
 
 ```java
         BlockingQueue<Runnable> queue;
@@ -144,6 +147,7 @@ ES预定义好了三种线程池：
             queue = new SizeBlockingQueue<>(ConcurrentCollections.<Runnable>newBlockingQueue(), queueCapacity);
         }
 ```
+
 当queueCapacity小于0时，队列是LinkedTransferQueue，为无界队列。实际上当前ES只有FORCE_MERGE的线程池是这种情况。感觉其实可以把FORCE_MERGE线程池换成newScaling类型。
 当queueCapacity大于0时，队列是SizeBlockingQueue，实际上是一个封装了的LinkedTransferQueue，为其加上了容量，参考offer方法：
 
