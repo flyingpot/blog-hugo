@@ -168,8 +168,8 @@ params:
       enable: false # 不蒜子统计
     leancloud:
       enable: true # leancloud统计
-      app_id: 8xQb6Rthdng8n3eYYU0RDi17-gzGzoHsz# leancloud <AppID>
-      app_key: LUnYpYT5LtBth7zCgGACr6Qz# leancloud <AppKey>
+      app_id: 8xQb6Rthdng8n3eYYU0RDi17-gzGzoHsz # leancloud <AppID>
+      app_key: LUnYpYT5LtBth7zCgGACr6Qz # leancloud <AppKey>
 
   # wordcount
   postCount:
