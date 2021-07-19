@@ -2,7 +2,7 @@
 <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 {{- else if and (.Site.Params.pv.leancloud.enable)  ( not .Site.Params.comment.valine.visitor )  }}
 <!-- custom analytics part create by xiamo -->
-<script defer src="https://cdn1.lncld.net/static/js/av-min-1.2.1.js"></script>
+<script src="//code.bdstatic.com/npm/leancloud-storage@4.11.1/dist/av-min.js"></script>
 <script defer>
     AV.init({
         appId: '{{- .Site.Params.pv.leancloud.app_id }}',
