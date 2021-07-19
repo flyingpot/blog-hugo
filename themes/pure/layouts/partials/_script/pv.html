@@ -6,7 +6,8 @@
 <script defer>
     AV.init({
         appId: '{{- .Site.Params.pv.leancloud.app_id }}',
-        appKey: '{{- .Site.Params.pv.leancloud.app_key }}'
+        appKey: '{{- .Site.Params.pv.leancloud.app_key }}',
+        serverURL: '{{- .Site.Params.pv.leancloud.server_url }}'
     });
 
     function showTime(Counter) {
