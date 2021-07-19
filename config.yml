@@ -120,7 +120,7 @@ params:
       url: favicon.ico
     title: Hugo # 页面title
     favicon: favicon.ico
-    board: <p>enjoy~</p> # 公告牌
+    board: <p>欢迎大家评论交流！Enjoy yourself！</p> # 公告牌
 
   # Share
   # weibo,qq,qzone,wechat,tencent,douban,diandian,facebook,twitter,google,linkedin
@@ -167,9 +167,9 @@ params:
     busuanzi:
       enable: false # 不蒜子统计
     leancloud:
-      enable: false # leancloud统计
-      app_id: # leancloud <AppID>
-      app_key: # leancloud <AppKey>
+      enable: true # leancloud统计
+      app_id: 8xQb6Rthdng8n3eYYU0RDi17-gzGzoHsz# leancloud <AppID>
+      app_key: LUnYpYT5LtBth7zCgGACr6Qz# leancloud <AppKey>
 
   # wordcount
   postCount:
