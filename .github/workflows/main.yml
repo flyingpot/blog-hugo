@@ -9,7 +9,7 @@ jobs:
     - name: Checkout master
       uses: actions/checkout@v2
     - name: hugo-cos-deploy
-      uses: flyingpot/hugo-cos-deploy@v1.0.1
+      uses: flyingpot/hugo-cos-deploy@1.0.1
       with:
         secret_id: ${{ secrets.SecretId }}
         secret_key: ${{ secrets.SecretKey }}
