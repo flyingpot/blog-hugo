@@ -1,5 +1,5 @@
 name = "Fan Jingbo"
-avatar = "images/profile.jpeg" # Avatar image. Default to "images/profile.webp".
+#avatar = "images/profile.jpeg" # Avatar image. Default to "images/profile.webp".
 bio = "Software Engineer"
 #company = "Null"
 location = "Shenzhen"

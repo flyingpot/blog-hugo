@@ -6,7 +6,7 @@ description = "Fan Jingbo's Blog"
 keywords = "Blog, Elasticsearch, Java, Rust"
 # images = ["site-feature-image.jpg"]
 
-logo = "favicon.ico" # Logo image. Default to "images/logo.webp".
+logo = "images/favicon.webp" # Logo image. Default to "images/logo.webp".
 brand = "Fan Jingbo's Blog"
 # menusPosition = "left" # Menus position: right(default), left or center.
 
