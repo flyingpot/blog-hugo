@@ -5,6 +5,13 @@ admin_path: ''
 webhook_url: 
 sections:
 - type: directory
+  path: content/post/zh-cn
+  label: 博文
+  create: all
+  match: "**/*"
+  templates:
+  - hugo
+- type: directory
   path: content/post
   label: Post
   create: all
