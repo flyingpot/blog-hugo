@@ -37,4 +37,5 @@ pages:
 - content/post/linux-oom-killer.md
 - content/post/travis-ci自动部署博客到腾讯云cos.md
 - content/post/刷题专题总结-链表篇.md
+- content/zh-cn/post/elasticsearch-6.md
 - content/zh-cn/post/netty.md
