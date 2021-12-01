@@ -1,7 +1,6 @@
 +++
 categories = []
 date = 2021-11-29T16:00:00Z
-draft = true
 tags = ["Elasticsearch", "Java"]
 title = "Elasticsearch源码解析——Guice"
 url = "/post/elasticsearch-node-start1"
@@ -23,8 +22,36 @@ Elasticsearch由于模块众多，并且模块间耦合也比较严重，不同�
 
 Guice本身的用法是比较多样的，最新的版本号已经到了5.0.1。但是ES中引入的Guice版本很老，大概是2.0。所以实际上，ES仅仅用了Guice很少的一部分特性。
 
-ES对于Guice的使用主要是在各个Module中和Node类中。这里举一个ActionModule类作为说明：ActionModule类继承了AbstractModule抽象类并重写了configure方法，在这个方法中，主要就是完成实例到类的绑定
+ES对于Guice的使用主要是在各个Module中和Node类中。这里举ActionModule类作为说明：ActionModule类继承了AbstractModule抽象类并重写了configure方法，在这个方法中，主要就是完成实例到类的绑定
 
 ```Java
+// 这里是将手动实例化的实例注册到对应的类上
+bind(ActionFilters.class).toInstance(actionFilters);
 
+// 这里是将循环将所有TransportAction相关实例注册起来，其中构造函数依赖的实例会自动注入
+bind(action.getTransportAction()).asEagerSingleton();
 ```
+
+然后在Node类中，client作为节点触发TransportAction的入口，会将所有TransportAction注入进来：
+```Java
+client.initialize(injector.getInstance(new Key<Map<ActionType, TransportAction>>() {}), () -> clusterService.localNode().getId(), transportService.getRemoteClusterService(), namedWriteableRegistry);
+```
+
+其中injector.getInstance可以根据Type来获取实例，其中injector是Node类中所有注入完成后得到的：
+
+```Java
+ModulesBuilder modules = new ModulesBuilder();
+// 这里面把包括上面所说的ActionModule全部添加进来
+modules.add(...);
+injector = modules.createInjector();
+```
+
+这样完成后，通过调用injector.getInstance就可以根据类或者Type获取实例了，非常方便。
+
+## 四、正在被抛弃的Guice
+
+虽然上面说了很多Guice的优点，但是ES社区却一直打算把Guice从源码中去掉的，参考这个[issue](https://github.com/elastic/elasticsearch/issues/43881)https://github.com/elastic/elasticsearch/issues/43881)。原因其实也很明确：
+
+> In addition to the overhead of keeping a forked copy, Guice blocks us from having a stable plugin api because plugin authors can get at any internal service from any plugin.
+
+也就是说社区既不想维护一个fork过来的Guice版本，又因为Guice的引入，导致插件代码中可以随意调用内部的实例，这又导致了ES的插件接口无法稳定下来（因为去除Guice意味着需要增加一些无法用Guice获取的实例到接口中）。
