@@ -23,19 +23,5 @@ fields:
   default: []
   label: categories
 pages:
-- content/post/ctf-bof-pwnable.kr.md
-- content/post/ctf探秘-一-collision-pwnable-kr.md
-- content/post/default.md
-- content/post/elasticsearch-1.md
-- content/post/elasticsearch-2.md
-- content/post/elasticsearch-3.md
-- content/post/elasticsearch-4.md
-- content/post/elasticsearch-5.md
-- content/post/elasticsearch-rescore.md
-- content/post/elasticsearch.md
-- content/post/hashset.md
-- content/post/linux-oom-killer.md
-- content/post/travis-ci自动部署博客到腾讯云cos.md
-- content/post/刷题专题总结-链表篇.md
 - content/zh-cn/post/elasticsearch-6.md
 - content/zh-cn/post/netty.md
