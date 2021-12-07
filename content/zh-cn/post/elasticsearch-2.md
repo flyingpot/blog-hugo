@@ -135,17 +135,19 @@ client和server两部分都注册了这个handler，因为客户端和服务端�
 
 这是一个握手action的注册方法，处理方法是返回HandshakeResponse，包含了服务端节点的一些信息。根据这些内容，开发者就可以很简单地定义出自己的action。实际上，ES源码做了更细致地封装，根据具体需求来实现TransportAction的一些子类（定义在org.elasticsearch.action.support里面的包中）即可。
 
+注意，handleRequest时需要将requestId传回请求节点，以便请求节点能找到对应的handler。
+
 ### 三、出方向
 
-如方向这里就简单很多了，我们这次反方向来看。调用的入口是TransportService的sendRequest，然后是sendRequestInternal。比较重要的是这一行代码：
+出方向这里就简单很多了，我们这次反方向来看。调用的入口是TransportService的sendRequest，然后是sendRequestInternal。比较重要的是这一行代码：
 
 ```java
-        final long requestId = responseHandlers.add(new Transport.ResponseContext<>(responseHandler, connection, action));
+final long requestId = responseHandlers.add(new Transport.ResponseContext<>(responseHandler, connection, action));
 ```
 
 这里就可以和上文对应上了，在发送请求时注册了一个对应requestId的responseHandler，然后在接收请求时拿出来requestId对应handler。
 
-然后就到了OutboundHander类，这里其实除了sendRequest还有sendResponse方法。因为作为服务端的节点要发送response给客户端节点。其余的就是一个序列化操作，这里就不赘述了。
+然后就到了OutboundHandler类，这里其实除了sendRequest还有sendResponse方法。因为作为服务端的节点要发送response给客户端节点。这里其实就是简单的序列化操作。
 
 ### 四、总结
 
