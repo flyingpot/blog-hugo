@@ -24,4 +24,5 @@ fields:
   label: categories
 pages:
 - content/zh-cn/post/elasticsearch-6.md
+- content/zh-cn/post/elasticsearch-7.md
 - content/zh-cn/post/netty.md
