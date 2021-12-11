@@ -56,7 +56,7 @@ class PetShop {
 
 但是在只需要实现接口一个方法的情况下，我们可以简化上面的使用方式，使用匿名函数，也就是Lambda表达式：
 
-```
+```Java
 interface Pet {
     String getName();
 }
