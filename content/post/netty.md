@@ -4,6 +4,7 @@ date = 2021-08-02T16:00:00Z
 tags = ["Netty", "Java"]
 title = "Netty的主从多线程，你真的理解了吗？"
 url = "/post/netty-reactor"
+lastmod = 2021-12-17T23:00:00Z
 
 +++
 ### 一、前言
@@ -11,6 +12,8 @@ url = "/post/netty-reactor"
 Netty是一个非常成熟的Java NIO库，被用在了许多大型项目中，比如Elasticsearch、Vert.x等。之前没有仔细阅读过Netty源码，但是通过网络上的文章对Netty的基本原理了解了一些。比如说，Netty使用的是主从多线程模型，其中，boss线程池负责接收请求，worker线程池负责处理请求。
 
 但是，前一段时间，我在定位一个由于JNI（Java Native Interface)导致的ES网络线程死锁问题时，发现虽然Netty的线程池大部分都死锁了，但是仍然有一个线程是完全空闲的。而我通过阅读ES源码发现，Netty的boss线程和worker线程使用了同一个线程池，按理说不应该有一个线程出现完全空闲的情况。这让我十分诧异，在我的理解中，出现这种情况的唯一一种解释就是：处理accept只占用了一个boss线程，由于没有新连接，所以那个线程始终时空闲的。我简单Google了一下，发现好像的确是[这样](https://github.com/netty/netty/issues/8925)的。
+
+> 这里完全理解错误了，实际上那个线程是epoll的阻塞线程，大概的堆栈是停在EPoll.wait方法。这个线程是一个总的epoll方法，负责处理OP\_ACCEPT,OP\_READ,OP\_WRITE操作。由于故障导致节点netty线程卡死，所以epoll线程就一直阻塞等待新的网络IO。
 
 由此，我开始阅读起了Netty源码，毕竟纸上得来终觉浅嘛。最后我发现这个问题，真的不是有些文章里面说的那样。本篇文章会从网络I/O的类型出发，一直讲到Netty的设计哲学，最终从代码角度解决Netty的主从多线程到底是什么的问题。
 
