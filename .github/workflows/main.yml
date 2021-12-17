@@ -9,7 +9,7 @@ jobs:
     - name: Checkout master
       uses: actions/checkout@v2
       with:
-        submodules: true
+        submodules: false
     - name: hugo-cos-deploy
       uses: flyingpot/hugo-cos-deploy@1.0.0
       with:
