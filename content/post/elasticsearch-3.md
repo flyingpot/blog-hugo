@@ -2,7 +2,7 @@
 categories = ["Elasticsearch源码解析"]
 date = 2021-04-18T16:00:00Z
 tags = ["Elasticsearch", "Java"]
-title = "【Elasticsearch源码解析】线程池篇——ES的线程池是怎么实现的？"
+title = "【Elasticsearch源码解析】线程池篇——ES的线程池概述"
 url = "/post/elasticsearch-threadpool1"
 
 +++
