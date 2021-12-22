@@ -4,6 +4,7 @@ date = 2021-12-06T16:00:00Z
 tags = ["Java", "Elasticsearch"]
 title = "Elasticsearch源码解析——通信模块（三）"
 url = "/post/elasticsearch-network3"
+lastmod = 2021-12-22T21:38:00Z
 
 +++
 通过上一篇文章，节点间通讯的数据流动已经搞清楚了：
@@ -58,3 +59,13 @@ Connection是一个接口，看下实现，发现可能是TcpTransport中的Node
 4. connectToNode拿到channels将其注册到map中，方便连接重用
 
 所以实际sendRequest调用的是NodeChannels的sendRequest方法，在序列化网络通信前，还判断了一下传入的options参数属于channel的哪一个类型，从连接池中选择对应类型的连接使用。
+
+```Java
+public TcpChannel channel(TransportRequestOptions.Type type) {
+    ConnectionProfile.ConnectionTypeHandle connectionTypeHandle = typeMapping.get(type);
+    if (connectionTypeHandle == null) {
+        throw new IllegalArgumentException("no type channel for [" + type + "]");
+    }
+    return connectionTypeHandle.getChannel(channels);
+}
+```
