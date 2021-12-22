@@ -1,10 +1,10 @@
 +++
 categories = ["Elasticsearch源码解析"]
 date = 2021-12-06T16:00:00Z
-tags = ["Java", "Elasticsearch"]
-title = "Elasticsearch源码解析——通信模块（三）"
-url = "/post/elasticsearch-network3"
 lastmod = 2021-12-22T21:38:00Z
+tags = ["Java", "Elasticsearch"]
+title = "【Elasticsearch源码解析】通信模块篇——ES中对Transport连接是如何管理的"
+url = "/post/elasticsearch-network3"
 
 +++
 通过上一篇文章，节点间通讯的数据流动已经搞清楚了：
