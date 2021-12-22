@@ -36,7 +36,7 @@ url = "/post/elasticsearch-network3"
 
 节点间通过openConnection和connectToNode来建立连接，区别是openConnection建立的连接不能通过ConnectionManager管理，需要发起连接的节点自己管理连接，而connectToNode方法建立的连接会通过ConectionManager管理。
 
-建立连接会从两个类中发起（这里不考虑7版本前使用的Discovery模块类ZenDiscovery），一个是Coordinator：集群在选主过程中会建立连接，另一个是NodeConnectionsService：这个的类目的就是保持节点间的连接。
+建立连接会从两个类中发起（这里不考虑7版本前使用的Discovery模块类ZenDiscovery），一个是Coordinator：集群在选主过程中会建立连接，另一个是NodeConnectionsService：这个的类目的就是保持节点间的连接，当节点连接断开时，会自动重试连接。
 
 因此，节点间的连接可以认为是一直存在的，当需要Transport请求时，从ConnectionManager中拿到一个连接Connection使用就好。
 
@@ -52,9 +52,9 @@ Connection是一个接口，看下实现，发现可能是TcpTransport中的Node
 
 1. 在ClusterConnectionManager的connectToNode方法中注册了一个listener回调
 2. 根据ConnectionProfile的配置初始化所有channels，默认有13个连接，分别为以下几组
-|  recovery   | bulk  | reg | state | ping |
-|  ---------  | ----  | --- | ----- | ---- |
-|     3       |   3   |  6  |    1  |   1  |
+   |  recovery   | bulk  | reg | state | ping |
+   |  ---------  | ----  | --- | ----- | ---- |
+   |     3       |   3   |  6  |    1  |   1  |
 3. 确认所有连接之后，发送一个握手请求（ChannelConnectedListener）后完成连接初始化，调用listener.onResponse(nodeChannels)完成回调
 4. connectToNode拿到channels将其注册到map中，方便连接重用
 
