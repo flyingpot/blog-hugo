@@ -23,4 +23,5 @@ fields:
   default: []
   label: categories
 pages:
+- content/post/elasticsearch-es.md
 - content/post/linux-i-o.md
