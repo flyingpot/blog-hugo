@@ -2,7 +2,7 @@
 categories = ["Elasticsearch源码解析"]
 date = 2021-07-28T16:00:00Z
 tags = ["Elasticsearch", "Java"]
-title = "Elasticsearch源码解析——线程池（二）"
+title = "【Elasticsearch源码解析】线程池篇——线程上下文ThreadContext"
 url = "/post/elasticsearch-threadpool2"
 
 +++
