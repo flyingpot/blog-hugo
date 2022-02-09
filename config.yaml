@@ -144,3 +144,10 @@ markup:
         startLevel: 2
     highlight:
         noClasses: false
+
+module:
+  # uncomment line below for temporary local development of module
+  # replacements: "github.com/CaiJimmy/hugo-theme-stack -> ../../hugo-theme-stack"
+  imports:
+    - path: github.com/CaiJimmy/hugo-theme-stack
+      disable: false
