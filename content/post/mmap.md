@@ -57,9 +57,25 @@ url = "/post/mmap-is-shit-in-dbms"
 
 为了解决事务安全问题，有以下三个解决方式：
 
-- 操作系统写时复制（copy-on-write）
+- 操作系统写时复制（copy-on-write）：使用MAP_PRIVATE标识位创建一个独立的写空间（物理内存复制），写操作在这个写空间执行，读操作仍读取原来的空间。同时使用WAL（write-ahead log）来保证写入操作被持久化。事务提交之后将写空间新增的内容复制到读空间。
 
-- 用户空间
+> 这里存在一个疑问，原文是这样表述的：
+When a transaction
+commits, the DBMS flushes the corresponding WAL records to
+secondary storage and uses a separate background thread to apply
+the committed changes to the primary copy.
+我的理解是：持久化的不应该是WAL的记录，而应该是写空间的msync，只有msync意外中断的时候，才需要从WAL恢复。
+作者应该理解没问题，可能只是表述的问题。也可能是我理解错了。
+
+- 用户空间写时复制（copy-on-write）：类似操作系统写时复制，不过写空间在用户空间开辟，同样写入WAL保证持久性。事务提交后，从用户空间写回读空间。
+
+> 这里提到了：
+Since copying an entire page is wasteful
+for small changes, some DBMSs support applying WAL records
+directly to the mmap-backed memory.
+特殊提到了一些数据库支持WAL直接写入，说明不是大多数数据库的行为，也验证了上面疑问中我的理解应该是对的。
+
+- 影子分页：
 
 ## 实验说明
 
