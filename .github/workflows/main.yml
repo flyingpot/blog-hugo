@@ -11,7 +11,7 @@ jobs:
       with:
         submodules: true
     - name: hugo-cos-deploy
-      uses: flyingpot/hugo-cos-deploy@1.0.3
+      uses: flyingpot/hugo-cos-deploy@1.0.4
       with:
         secret_id: ${{ secrets.SecretId }}
         secret_key: ${{ secrets.SecretKey }}
