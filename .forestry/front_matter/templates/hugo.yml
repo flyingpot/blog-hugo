@@ -25,3 +25,4 @@ fields:
 pages:
 - content/post/elasticsearch-es.md
 - content/post/linux-i-o.md
+- content/post/mmap.md
