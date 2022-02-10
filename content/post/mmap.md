@@ -1,7 +1,6 @@
 +++
 categories = []
 date = 2022-02-08T16:00:00Z
-draft = true
 tags = ["数据库"]
 title = "为什么不要在数据库系统中使用MMAP？"
 url = "/post/mmap-is-shit-in-dbms"
@@ -64,8 +63,7 @@ When a transaction
 commits, the DBMS flushes the corresponding WAL records to
 secondary storage and uses a separate background thread to apply
 the committed changes to the primary copy.
-我的理解是：持久化的不应该是WAL的记录，而应该是写空间的msync，只有msync意外中断的时候，才需要从WAL恢复。
-作者应该理解没问题，可能只是表述的问题。也可能是我理解错了。
+我的理解是：持久化的不应该是WAL的记录，而应该是写空间的msync，只有msync意外中断的时候，才需要从WAL恢复。这个理解有可能是错误的，等我之后理解了再来更新吧。
 
 - 用户空间写时复制（copy-on-write）：类似操作系统写时复制，不过写空间在用户空间开辟，同样写入WAL保证持久性。事务提交后，从用户空间写回读空间。
 
@@ -73,12 +71,56 @@ the committed changes to the primary copy.
 Since copying an entire page is wasteful
 for small changes, some DBMSs support applying WAL records
 directly to the mmap-backed memory.
-特殊提到了一些数据库支持WAL直接写入，说明不是大多数数据库的行为，也验证了上面疑问中我的理解应该是对的。
+特殊提到了一些数据库支持WAL直接写入，说明不是大多数数据库的行为，也验证了上面疑问中我的理解可能是对的。
 
-- 影子分页：
+- 影子分页：影子分页类似第一种方法，不过没有WAL的参与，而是直接出来两份分页，一份只读的，另一份可写，事务提交就是在可写页表做msync之后再让只读页表可以读到最新的页。
+
+### 问题二 I/O停顿
+
+作者主要提到的就是，由于MMAP将文件加载到内存的过程是操作系统控制的，所以无法保证将要查询的页面在内存中，这时就会出现page cache的换入换出，导致I/O停顿。
+
+这一点比较好理解，毕竟操作系统使用page cache并没有针对数据库场景进行特别的优化，那么很有可能在页面将要被使用的时候，由于page cache不足要使用的页面被换出，从而影响性能。
+
+### 问题三 错误处理
+
+首先是MMAP对文件内容的校验要以单个页面为单位，不能基于多个页面来做，因为有可能要使用的页面会被换出。
+
+另外，对于一些使用内存不安全语言写的数据库系统（感觉大部分都是用内存不安全的C++写的），指针错误可能导致页面问题。使用buffer pool可以通过写入前的检查规避这个问题，但是MMAP会默默将错误的页面写到存储中。
+
+还有，MMAP要应对的系统调用会出现的SIGBUS信号报错，相比之下使用其他I/O方式的buffer pool就能比较轻松的处理I/O错误。
+
+### 问题四 性能问题
+
+其实讲到这里，作者才算是“图穷匕见”，因为这片论文后面的实验主要想证明的就是这一点。
+
+业界里面大家普遍认为MMAP比传统read/write更快，这主要基于以下两点原因：
+1. 负责文件映射操作，并且处理page fault的是内核，而不是应用程序
+2. MMAP帮助避免了用户空间中的额外的复制操作，相应的也减少了内存的占用
+
+接下来作者提出了他们的发现：MMAP相对于传统read/write I/O在目前高带宽的存储设备上是更差的。并指出了三点原因：
+1. 页表竞争
+
+> 这一点没有太理解，下面的解释是：
+Finally,
+the OS must synchronize the page table, which becomes highly
+contended with many concurrent threads.
+但是我理解线程切换应该不需要切换页表
+
+2. 单线程的页面换出：
+页面换出是单线程的（使用kswapd），这点与CPU相关
+
+3. TLB shootdowns
+当一个页面失效时，每个核心的TLB都需要一次中断来做刷新操作，这个操作可能会消耗几千个时钟周期，是非常耗时的。
 
 ## 实验说明
 
+这里的实验就不详细写了，有兴趣的可以去看原文。作者主要分了随机读写和顺序读写两个实验来做，证明了直接I/O比MMAP有几倍到几十倍的速度优势。
+
 ## 总结
 
-经过几个小时的研读和理解，我
+Andy和他的学生无疑是buffer pool的拥趸，他们代表着学术界，不建议在数据库系统中使用MMAP。但我们看一下工业界，还是有很多数据库系统在使用MMAP。这可能也是这两类人的立场不同导致的吧。对于学术界来说，性能是最重要的，成本并不是需要考虑的重点。而工业界则是追求在能接受的成本下实现最好的性能。
+所以说，计算机科学领域没有银弹，就像I/O方式的选择一样，从传统的read/write到mmap，再到直接I/O和异步I/O，每一种方式都有人在使用，并不是说异步I/O性能好就能吸引所有人使用，毕竟要受到成本和其他因素的限制。
+不过呢，还是希望工业界能够在技术追求上内卷起来，毕竟谁不愿意搞出来一个很叼的东西呢。感觉ScyllaDB就是个不错的例子，也希望他们能火起来吧。
+
+> RavenDB的CEO写了一篇[博客](https://ravendb.net/articles/re-are-you-sure-you-want-to-use-mmap-in-your-database-management-system)回应了这篇论文，这也算是工业界的反击吧，有趣有趣。
+
