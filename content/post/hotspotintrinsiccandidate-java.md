@@ -9,7 +9,9 @@ url = "/post/hotspot-intrinsic-candidate"
 Java为了满足跨平台的需求，将Java代码首先编译成平台无关的字节码，然后通过JVM解释执行。同时，为了尽可能的提高性能引入了即时编译（JIT），会在代码运行时分析热点代码片段将其编译为字节码执行。原理我能讲出来，但是细节方面我就说不出来了。这次我以一个注解为入口，看看JDK源码来了解一下Java即时编译的简单原理。
 
 ### HotSpotIntrinsicCandidate注解
+
 之前我在看Netty内存分配逻辑的时候，发现Netty分配内存并没有使用new关键字，而是使用了下面这个方法：
+
 ```Java
 @HotSpotIntrinsicCandidate  
 private Object allocateUninitializedArray0(Class<?> componentType, int length) {  
@@ -34,20 +36,22 @@ private Object allocateUninitializedArray0(Class<?> componentType, int length) {
 
 从JDK7开始，Java支持分层编译。关于分层编译的定义，可以参考源码[compilationPolicy.hpp](https://github.com/openjdk/jdk/blob/master/src/hotspot/share/compiler/compilationPolicy.hpp)的注释，写的非常清楚，截取一段对于层级的定义如下：
 
-> The system supports 5 execution levels:
-> level 0 - interpreter
-> level 1 - C1 with full optimization (no profiling)
-> level 2 - C1 with invocation and backedge counters
-> level 3 - C1 with full profiling (level 2 + MDO)
-> level 4 - C2
+    The system supports 5 execution levels:
+    level 0 - interpreter
+    level 1 - C1 with full optimization (no profiling)
+    level 2 - C1 with invocation and backedge counters
+    level 3 - C1 with full profiling (level 2 + MDO)
+    level 4 - C2
 
 看起来很复杂，有五个层级，其实理解起来很简单：
+
 1. 执行速度上：0 < 1 < 4，2比1慢，3比2慢（因为需要记录一些信息）
 2. 编译时间上：0 < 1 < 4，2和3与1相同
 3. JDK会根据C1和C2编译器的排队情况和C1或者解释器执行的统计值决定下一个状态是什么，正常情况下都是从0最终到4，但在优化过于激进的情况下可能会回退状态（比如C2速度和C1相同的情况）。
 
 这里借用一下[美团技术团队](https://tech.meituan.com/)的状态流转图：
-![[Pasted image 20220629235027.png]]
+
+![](/images/jit-policy.png)
 
 ### 看源码
 
@@ -173,9 +177,8 @@ byte[] bytes = new byte[10];
 
 这次“浅入”JDK源码，原理部分看懂的不多，但是即时编译的流程了解了一些，也明白了为什么Netty要用带有即时编译优化的Unsafe方法替换掉new。希望以后还有机会去真正深入看看JDK源码。
 
-
-
 ### 参考链接
-1.  [基本功 | Java即时编译器原理解析及实践](https://tech.meituan.com/2020/10/22/java-jit-practice-in-meituan.html)
-2.  [JDK源码Github仓库](https://github.com/openjdk/jdk)
-3.  [HotSpot Intrinsics](https://alidg.me/blog/2020/12/10/hotspot-intrinsics)
+
+1. [基本功 | Java即时编译器原理解析及实践](https://tech.meituan.com/2020/10/22/java-jit-practice-in-meituan.html)
+2. [JDK源码Github仓库](https://github.com/openjdk/jdk)
+3. [HotSpot Intrinsics](https://alidg.me/blog/2020/12/10/hotspot-intrinsics)
