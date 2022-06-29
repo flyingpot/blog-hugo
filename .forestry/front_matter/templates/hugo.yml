@@ -24,5 +24,6 @@ fields:
   label: categories
 pages:
 - content/post/elasticsearch-es.md
+- content/post/hotspotintrinsiccandidate-java.md
 - content/post/linux-i-o.md
 - content/post/mmap.md
