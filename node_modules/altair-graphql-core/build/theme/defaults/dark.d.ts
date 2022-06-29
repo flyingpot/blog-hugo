@@ -1,0 +1,4 @@
+import { ICustomTheme } from '../theme';
+declare const theme: ICustomTheme;
+export default theme;
+//# sourceMappingURL=dark.d.ts.map

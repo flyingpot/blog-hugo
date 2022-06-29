@@ -1,0 +1,1 @@
+{"version":3,"file":"UseEditablePropsOptions.d.ts","sourceRoot":"","sources":["../../src/types/UseEditablePropsOptions.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,aAAa,EAAE,MAAM,sCAAsC,CAAC;AACrE,OAAO,EAAE,sBAAsB,EAAE,MAAM,0BAA0B,CAAC;AAElE;;GAEG;AACH,MAAM,WAAW,uBACf,SAAQ,IAAI,CAAC,sBAAsB,EAAE,IAAI,CAAC;IAC1C,aAAa,CAAC,EAAE,aAAa,CAAC;CAC/B"}

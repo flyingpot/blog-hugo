@@ -1,0 +1,11 @@
+import { PluginContext } from './context/context.interface';
+export declare abstract class PluginBase {
+    protected ctx: PluginContext;
+    constructor(ctx: PluginContext);
+    abstract initialize(ctx: PluginContext): void;
+    abstract destroy(): void;
+}
+export interface PluginConstructor<T extends PluginBase = PluginBase> {
+    new (): T;
+}
+//# sourceMappingURL=base.d.ts.map

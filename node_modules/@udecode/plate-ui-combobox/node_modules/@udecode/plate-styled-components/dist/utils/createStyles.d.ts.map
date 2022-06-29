@@ -1,0 +1,1 @@
+{"version":3,"file":"createStyles.d.ts","sourceRoot":"","sources":["../../src/utils/createStyles.ts"],"names":[],"mappings":"AAEA,OAAO,EAAE,OAAO,EAAE,MAAM,mBAAmB,CAAC;AAC5C,OAAO,EAAE,WAAW,EAAE,MAAM,sBAAsB,CAAC;AAEnD,MAAM,WAAW,KAAK;IACpB,GAAG,EAAE,OAAO,EAAE,CAAC;IACf,SAAS,EAAE,MAAM,CAAC;CACnB;AAED,eAAO,MAAM,YAAY;;iBAGR,GAAG;;;UAMT,KAAK;6DAgDf,CAAC"}

@@ -1,0 +1,12 @@
+export declare enum AltairUiActionLocation {
+    RESULT_PANE = "result_pane"
+}
+export declare class AltairUiAction {
+    title: string;
+    location: AltairUiActionLocation;
+    callback: () => void;
+    id: string;
+    constructor(title: string, location: AltairUiActionLocation, callback: () => void);
+    execute(): void;
+}
+//# sourceMappingURL=ui-action.d.ts.map

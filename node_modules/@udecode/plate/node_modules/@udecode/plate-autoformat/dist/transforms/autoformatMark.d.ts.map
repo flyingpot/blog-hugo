@@ -1,0 +1,1 @@
+{"version":3,"file":"autoformatMark.d.ts","sourceRoot":"","sources":["../../src/transforms/autoformatMark.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,OAAO,EAAE,MAAM,qBAAqB,CAAC;AAG9C,OAAO,EAAE,kBAAkB,EAAE,MAAM,UAAU,CAAC;AAI9C,MAAM,WAAW,qBAAsB,SAAQ,kBAAkB;IAC/D,IAAI,EAAE,MAAM,CAAC;CACd;AAED,eAAO,MAAM,cAAc,WACjB,OAAO,sDACqC,qBAAqB,YAiE1E,CAAC"}

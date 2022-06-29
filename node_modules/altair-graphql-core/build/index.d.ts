@@ -1,0 +1,3 @@
+import { PluginBase, PluginConstructor } from './plugin/base';
+export declare const registerPluginClass: <T extends PluginBase>(pluginClassName: string, pluginClass: PluginConstructor<T>) => void;
+//# sourceMappingURL=index.d.ts.map

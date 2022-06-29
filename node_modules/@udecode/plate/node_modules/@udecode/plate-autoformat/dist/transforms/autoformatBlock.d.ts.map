@@ -1,0 +1,1 @@
+{"version":3,"file":"autoformatBlock.d.ts","sourceRoot":"","sources":["../../src/transforms/autoformatBlock.ts"],"names":[],"mappings":"AAQA,OAAO,EAAE,OAAO,EAAY,MAAM,qBAAqB,CAAC;AAGxD,OAAO,EAAE,mBAAmB,EAAE,MAAM,UAAU,CAAC;AAG/C,MAAM,WAAW,sBAAuB,SAAQ,mBAAmB;IACjE,IAAI,EAAE,MAAM,CAAC;CACd;AAED,eAAO,MAAM,eAAe,WAClB,OAAO,uGAUZ,sBAAsB,YA4D1B,CAAC"}

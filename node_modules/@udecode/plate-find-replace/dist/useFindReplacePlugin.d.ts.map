@@ -1,0 +1,1 @@
+{"version":3,"file":"useFindReplacePlugin.d.ts","sourceRoot":"","sources":["../src/useFindReplacePlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,cAAc,EAAqB,MAAM,OAAO,CAAC;AACpE,OAAO,EAAiB,WAAW,EAAE,MAAM,qBAAqB,CAAC;AAIjE;;;GAGG;AACH,eAAO,MAAM,oBAAoB;YACvB,WAAW;eACR,SAAS,eAAe,MAAM,CAAC,CAAC;CAc5C,CAAC"}

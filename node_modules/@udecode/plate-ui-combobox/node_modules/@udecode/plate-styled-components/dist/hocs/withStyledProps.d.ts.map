@@ -1,0 +1,1 @@
+{"version":3,"file":"withStyledProps.d.ts","sourceRoot":"","sources":["../../src/hocs/withStyledProps.tsx"],"names":[],"mappings":"AAAA,OAAc,EAAE,iBAAiB,EAAE,MAAM,OAAO,CAAC;AACjD,OAAO,EAAE,QAAQ,EAAE,KAAK,EAAE,MAAM,qBAAqB,CAAC;AAEtD,OAAO,EAAW,aAAa,EAAE,MAAM,mBAAmB,CAAC;AAE3D;;GAEG;AACH,eAAO,MAAM,eAAe;aAAyB,QAAQ;UAAQ,KAAK;cAC7D,kBAAkB,GAAG,CAAC;;;;;;;MAYhC,kBAAkB,GAAG,CAsBvB,CAAC"}

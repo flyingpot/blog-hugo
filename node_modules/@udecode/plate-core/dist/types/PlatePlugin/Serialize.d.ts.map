@@ -1,0 +1,1 @@
+{"version":3,"file":"Serialize.d.ts","sourceRoot":"","sources":["../../../src/types/PlatePlugin/Serialize.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,aAAa,EAAE,MAAM,iBAAiB,CAAC;AAChD,OAAO,EAAE,UAAU,EAAE,MAAM,cAAc,CAAC;AAE1C;;GAEG;AACH,MAAM,WAAW,SAAS;IACxB,OAAO,CAAC,EAAE,UAAU,CAAC,aAAa,CAAC,CAAC;IACpC,IAAI,CAAC,EAAE,UAAU,CAAC,UAAU,CAAC,CAAC;CAC/B"}

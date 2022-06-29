@@ -1,0 +1,11 @@
+export interface FileVariable {
+    id?: string;
+    name: string;
+    isMultiple?: boolean;
+    data?: File | File[];
+}
+export interface VariableState {
+    variables: string;
+    files: FileVariable[];
+}
+//# sourceMappingURL=variable.interfaces.d.ts.map

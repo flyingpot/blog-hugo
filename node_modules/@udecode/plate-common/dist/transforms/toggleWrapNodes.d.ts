@@ -1,0 +1,7 @@
+import { TEditor } from '@udecode/plate-core';
+/**
+ * Unwrap if the node type is in selection.
+ * Wrap otherwise.
+ */
+export declare const toggleWrapNodes: (editor: TEditor, type: string) => void;
+//# sourceMappingURL=toggleWrapNodes.d.ts.map

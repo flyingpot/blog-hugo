@@ -1,0 +1,1 @@
+{"version":3,"file":"setTableColSize.d.ts","sourceRoot":"","sources":["../../src/transforms/setTableColSize.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,kBAAkB,EAAsB,MAAM,uBAAuB,CAAC;AAC/E,OAAO,EAAE,OAAO,EAAY,MAAM,qBAAqB,CAAC;AAKxD,eAAO,MAAM,eAAe,WAClB,OAAO;cACkB,MAAM;WAAS,MAAM;aAC7C,kBAAkB,SAiB5B,CAAC"}

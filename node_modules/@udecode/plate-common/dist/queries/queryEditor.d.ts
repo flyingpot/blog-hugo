@@ -1,0 +1,7 @@
+import { TEditor } from '@udecode/plate-core';
+import { QueryEditorOptions } from '../types/QueryEditorOptions';
+/**
+ * Query the editor state.
+ */
+export declare const queryEditor: (editor: TEditor, { filter, selectionAtBlockStart, selectionAtBlockEnd, allow, exclude, at, }?: QueryEditorOptions) => boolean;
+//# sourceMappingURL=queryEditor.d.ts.map

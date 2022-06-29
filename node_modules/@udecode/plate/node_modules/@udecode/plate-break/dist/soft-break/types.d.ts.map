@@ -1,0 +1,1 @@
+{"version":3,"file":"types.d.ts","sourceRoot":"","sources":["../../src/soft-break/types.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,gBAAgB,EAAE,MAAM,uBAAuB,CAAC;AAEzD,MAAM,WAAW,aAAa;IAC5B,MAAM,EAAE,MAAM,CAAC;IACf;;OAEG;IACH,KAAK,CAAC,EAAE,gBAAgB,CAAC;CAC1B;AAED,MAAM,WAAW,yBAAyB;IACxC,KAAK,CAAC,EAAE,aAAa,EAAE,CAAC;CACzB;AAED,MAAM,WAAW,sBAAuB,SAAQ,yBAAyB;CAAG"}

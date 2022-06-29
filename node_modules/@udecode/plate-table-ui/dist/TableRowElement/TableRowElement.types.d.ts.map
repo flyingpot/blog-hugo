@@ -1,0 +1,1 @@
+{"version":3,"file":"TableRowElement.types.d.ts","sourceRoot":"","sources":["../../src/TableRowElement/TableRowElement.types.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,kBAAkB,EAAE,MAAM,kCAAkC,CAAC;AAEtE,MAAM,WAAW,yBAA0B,SAAQ,oBAAoB;CAEtE;AAED,MAAM,WAAW,qBAAqB;CAKrC;AAED,MAAM,WAAW,oBACf,SAAQ,kBAAkB,CAAC,EAAE,EAAE,qBAAqB,CAAC;IACrD,UAAU,CAAC,EAAE,OAAO,CAAC;CAEtB"}

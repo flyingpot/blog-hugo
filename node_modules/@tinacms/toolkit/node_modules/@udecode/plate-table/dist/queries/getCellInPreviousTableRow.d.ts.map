@@ -1,0 +1,1 @@
+{"version":3,"file":"getCellInPreviousTableRow.d.ts","sourceRoot":"","sources":["../../src/queries/getCellInPreviousTableRow.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,qBAAqB,CAAC;AAC9C,OAAO,EAAoB,SAAS,EAAE,IAAI,EAAE,MAAM,OAAO,CAAC;AAE1D,wBAAgB,yBAAyB,CACvC,MAAM,EAAE,OAAO,EACf,cAAc,EAAE,IAAI,GACnB,SAAS,GAAG,SAAS,CAgBvB"}

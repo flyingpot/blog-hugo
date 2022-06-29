@@ -1,0 +1,1 @@
+{"version":3,"file":"getNextTableCell.d.ts","sourceRoot":"","sources":["../../src/queries/getNextTableCell.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,qBAAqB,CAAC;AAC9C,OAAO,EAAU,SAAS,EAAE,IAAI,EAAE,MAAM,OAAO,CAAC;AAGhD,wBAAgB,gBAAgB,CAC9B,MAAM,EAAE,OAAO,EACf,WAAW,EAAE,SAAS,EACtB,WAAW,EAAE,IAAI,EACjB,UAAU,EAAE,SAAS,GACpB,SAAS,GAAG,SAAS,CAOvB"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"autoformatText.d.ts","sourceRoot":"","sources":["../../src/transforms/autoformatText.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,qBAAqB,CAAC;AAG9C,OAAO,EAAE,kBAAkB,EAAE,MAAM,UAAU,CAAC;AAI9C,MAAM,WAAW,qBAAsB,SAAQ,kBAAkB;IAC/D,IAAI,EAAE,MAAM,CAAC;CACd;AAED,eAAO,MAAM,cAAc,WACjB,OAAO,4CAC2B,qBAAqB,YA+DhE,CAAC"}
