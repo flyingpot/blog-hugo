@@ -84,7 +84,11 @@ boolean useDelegate(String name) {
  File-based Directory implementation that uses mmap for reading, and FSDirectory.FSIndexOutput for writing.
 ```
 
-FSIndexOutput实际上就会使用write而不是mmap来进行写入操作。我之前一直很好奇为什么写入不使用mmap。其实答案很明显，在实际写入之前，是没办法知道写入文件大小的，没有大小，就不能使用mmap + msync的方式进行写入（实际需要先ftruncate来修改出一个指定大小的文件用来mmap，这些操作很麻烦），而write调用则不受这个限制，并且ES的写入都是顺序写，使用write也是非常适合的。
+FSIndexOutput实际上就会使用write而不是mmap来进行写入操作。我之前一直很好奇为什么写入不使用mmap。
+
+其实原因很简单：假设使用mmap来写入，首先要指定好索引文件做映射，需要知道索引的大小，但是在实际写入之前，是没办法知道写入文件大小的（Lucene一般都是通过try-with-resources打开一个IndexOutput，然后开始写入）。使用mmap很难完成这样的操作，而write调用则不受这个限制。
+
+> 实际上Lucene的write是带buffer的，类似于fwrite，因此也不会触发过多的中断。mmap和fwrite相比，一个是预先映射好内存空间，另一个是一个buffer一个buffer写入Page Cache。对于已知大小的大文件写入，mmap应该会更快一些，但是Lucene的segment是比较小的，从性能上讲，mmap也没有优势。
 
 ## 总结
 
