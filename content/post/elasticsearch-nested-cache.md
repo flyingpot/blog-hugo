@@ -14,6 +14,7 @@ Lucene提供了父子关系文档的两种join查询：根据子文档查询父�
 
 首先看一下ToParentBlockJoinQuery，这个类的注释写的非常清楚：这种查询需要写入时将父子关系文档写在一个区间内，并且子文档在前，父文档在后。这里举个简单的例子，班级和学生，是有父子关系的文档，一个班级对应着多个学生。如果要使用对应的JoinQuery,写入的时候需要如下图进行写入，将作为子文档的学生写在一起，后面紧跟着作为父文档的班级。
 
+![](/images/nested-lucene-block.png)
 
 接下来看Query中的关键方法Scorer::iterator（这个方法返回的是查询返回文档的iterator,方便我们分析出Query是如何找到结果的），然后看到ParentApproximation中的两个方法nextDoc和advance：
 
