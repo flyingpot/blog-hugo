@@ -14,8 +14,9 @@ Lucene提供了父子关系文档的两种join查询：根据子文档查询父�
 
 首先看一下ToParentBlockJoinQuery，这个类的注释写的非常清楚：这种查询需要写入时将父子关系文档写在一个区间内，并且子文档在前，父文档在后。这里举个简单的例子，班级和学生，是有父子关系的文档，一个班级对应着多个学生。如果要使用对应的JoinQuery,写入的时候需要如下图进行写入，将作为子文档的学生写在一起，后面紧跟着作为父文档的班级。
 
-![[Pasted image 20220815233502.png]]
+
 接下来看Query中的关键方法Scorer::iterator（这个方法返回的是查询返回文档的iterator,方便我们分析出Query是如何找到结果的），然后看到ParentApproximation中的两个方法nextDoc和advance：
+
 ```java
 @Override  
 public int nextDoc() throws IOException {  
@@ -45,6 +46,7 @@ public int advance(int target) throws IOException {
 这里通过对于parentBits的prevSetBit和nextSetBit操作很巧妙的完成了advance，这样nextDoc就可以拿到所有查询到的子文档对应的父文档集合。
 
 再看下ToChildBlockJoinQuery，同样找到nextDoc和advance：
+
 ```java
 @Override  
 public int nextDoc() throws IOException {  
@@ -121,6 +123,7 @@ public int advance(int childTarget) throws IOException {
 ## ES的nested实现
 
 回到ES代码，可以看到Nested类型查询类NestedQueryBuilder中调用了ESToParentBlockJoinQuery（其实就是上面提到的ToParentBlockJoinQuery的一个代理类）。Nested Cache从源码一路找下去，最开始的初始化是在IndexService中的构造函数这里：
+
 ```java
 this.bitsetFilterCache = new BitsetFilterCache(indexSettings, new BitsetCacheListener(this));  
 this.warmer = new IndexWarmer(threadPool, indexFieldData, bitsetFilterCache.createListener(threadPool));  
@@ -128,6 +131,7 @@ this.indexCache = new IndexCache(indexSettings, queryCache, bitsetFilterCache);
 ```
 
 这里先看一下Nested类型是如何写入的，代码在DocumentParser类中：
+
 ```java
 private static ParseContext nestedContext(ParseContext context, ObjectMapper mapper) {  
     context = context.createNestedContext(mapper.fullPath());  
@@ -157,9 +161,8 @@ private static ParseContext nestedContext(ParseContext context, ObjectMapper map
 }
 ```
 
-
-
 现在已经写入了Nested类型，并且Nested Cache也已经初始化好了，接下来就到了预热Cache了，代码在BitSetFilterCache.BitSetProducerWarmer::warmReader中：
+
 ```java
 @Override  
 public IndexWarmer.TerminationHandle warmReader(final IndexShard indexShard, final ElasticsearchDirectoryReader reader) {  
@@ -218,6 +221,7 @@ public IndexWarmer.TerminationHandle warmReader(final IndexShard indexShard, fin
 ```
 
 再看下很重要的Queries.newNonNestedFilter实现：
+
 ```java
 public static Query newNonNestedFilter(Version indexVersionCreated) {  
     if (indexVersionCreated.onOrAfter(Version.V_6_1_0)) {
@@ -240,7 +244,9 @@ public static Query newNestedFilter() {
 在做Nested查询的时候，就可以找到Cache中的对应的父文档BitSet，拿到Lucene中去使用，从而得到最终的结果。
 
 ## Nested Cache加载时机
+
 Nested Cache并不是像大多数Cache一样，第一次调用查询的时候加载，而是在做refresh的时候就完成了加载。上面讲初始化的那里提到了，Nested Cache初始化之后被放到了IndexWarmer对象中去。最终在这里做refresh时完成了预热：
+
 ```java
 @Override  
 protected ElasticsearchDirectoryReader refreshIfNeeded(ElasticsearchDirectoryReader referenceToRefresh) throws IOException {  
