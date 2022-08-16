@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "@tinacms/cli": "^0.60.5",
-    "styled-components": "^5.3.3",
-    "tinacms": "^0.66.3"
-  }
-}
