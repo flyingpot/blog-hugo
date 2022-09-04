@@ -29,3 +29,4 @@ pages:
 - content/post/hotspotintrinsiccandidate-java.md
 - content/post/linux-i-o.md
 - content/post/mmap.md
+- content/post/tokio-goroutine.md
