@@ -3,7 +3,7 @@ categories = []
 date = 2022-10-31T17:00:00Z
 tags = ["Java"]
 title = "【JVM Anatomy Quark】 #1-循环中的锁粗化"
-url = "jvm-anatomy-quark-1-lock-coarsening-for-loops"
+url = "jvm-anatomy-quark-1"
 
 +++
 > [JVM Anatomy Quark](https://shipilev.net/jvm/anatomy-quarks/)是一系列关于JVM原理的文章集合，每一篇文章都不长，从不同的角度讲解JVM的底层原理。作者[Aleksey Shipilëv](https://shipilev.net/Aleksey_Shipilev_CV.pdf)是OpenJDK的著名开发者，开发过Shenandoah GC，现在任职于RedHat公司。
