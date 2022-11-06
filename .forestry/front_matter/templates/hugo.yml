@@ -28,6 +28,7 @@ pages:
 - content/post/elasticsearch-page-cache.md
 - content/post/hotspotintrinsiccandidate-java.md
 - content/post/jvm-anatomy-quark-1.md
+- content/post/jvm-anatomy-quark-2.md
 - content/post/linux-i-o.md
 - content/post/mmap.md
 - content/post/tokio-goroutine.md
