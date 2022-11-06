@@ -1,4 +1,5 @@
 +++
+categories = ["JVM Anatomy Quark"]
 date = 2022-10-31T01:00:00Z
 tags = ["Java"]
 title = "【JVM Anatomy Quark】 #1-循环中的锁粗化"
